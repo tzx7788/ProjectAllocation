@@ -20,6 +20,8 @@ package ZhixiongTang.ProjectAllocation.api.impl;
  */
 
 import ZhixiongTang.ProjectAllocation.api.HelloService;
+
+import org.ProjectAllocation.model.App;
 import org.springframework.stereotype.Service;
 
 /**
@@ -31,6 +33,11 @@ public class DefaultHelloService
 {
     public String sayHello( String who )
     {
-        return "Hello " + who;
+        return "Hellkjlo " + who;
+    }
+    
+    public String playGame( String game )
+    {
+    	return App.play(game);
     }
 }

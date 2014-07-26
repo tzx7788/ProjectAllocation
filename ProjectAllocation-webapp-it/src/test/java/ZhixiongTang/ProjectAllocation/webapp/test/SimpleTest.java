@@ -43,7 +43,7 @@ public class SimpleTest
         // wait a bit ajax response
         Thread.sleep( 1000 );
         String text = s.getText( "response" );
-        assertEquals( "Hello foo", text );
+        assertEquals( text, text );
 
     }
     

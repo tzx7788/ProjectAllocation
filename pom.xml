@@ -104,6 +104,11 @@
       </dependency>
       <dependency>
         <groupId>ZhixiongTang</groupId>
+        <artifactId>ProjectAllocation-model</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ZhixiongTang</groupId>
         <artifactId>ProjectAllocation-webapp</artifactId>
         <version>${project.version}</version>
         <type>war</type>
@@ -223,6 +228,7 @@
   <modules>
     <module>ProjectAllocation-api</module>
     <module>ProjectAllocation-api-impl</module>
+    <module>ProjectAllocation-model</module>
     <module>ProjectAllocation-webapp</module>
     <module>ProjectAllocation-webapp-exec</module>
     <module>ProjectAllocation-webapp-it</module>
