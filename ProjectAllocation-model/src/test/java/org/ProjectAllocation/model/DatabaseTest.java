@@ -124,11 +124,30 @@ public class DatabaseTest extends TestCase {
 		Session session = sf.openSession();
 		Transaction tx = session.beginTransaction();
 		Student s1 = (Student) session.get(Student.class, "s1");
-		Student s2 = (Student) session.get(Student.class, "s2");
-		Student s3 = (Student) session.get(Student.class, "s3");
 		Professor p1 = (Professor) session.get(Professor.class, "p1");
-		Professor p2 = (Professor) session.get(Professor.class, "p2");
 		Professor p3 = (Professor) session.get(Professor.class, "p3");
+		s1.getPreferList().add(p3);
+		assertFalse(p3.getLikedBy().contains(s1));
+		p3.getLikedBy().add(s1);
+		assertTrue(p3.getLikedBy().contains(s1));
+		s1.getPreferList().remove(p1);
+		assertTrue(p1.getLikedBy().contains(s1));
+		s1.setName("tzxtzx");
+		session.save(s1);
+		tx.commit();
+		session.close();
+		sf = new Configuration().configure()
+		.buildSessionFactory();
+		session = sf.openSession();
+		tx = session.beginTransaction();
+		s1 = (Student) session.get(Student.class, "s1");
+		p1 = (Professor) session.get(Professor.class, "p1");
+		p3 = (Professor) session.get(Professor.class, "p3");
+		System.out.println("size:" + p3.getLikedBy().size());
+		assertTrue(s1.getPreferList().contains(p3));
+		assertTrue(p3.getLikedBy().contains(s1));
+		assertFalse(p1.getLikedBy().contains(s1));
+		assertEquals(s1.getName(),"tzxtzx");
 		tx.commit();
 		session.close();
 	}
