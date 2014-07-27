@@ -14,6 +14,13 @@ public class Professor extends AbstractEntity {
 	 * 
 	 */
 	private static final long serialVersionUID = 1141185595926572529L;
+	
+	public static final String TABLENAME = "Professor";
+	public static final String COL_PID = "PID";
+	public static final String COL_NAME = "NAME";
+	public static final String COL_PASSWORD = "PASSWORD";
+	public static final String PREFERENCETABLE = "PPreference";
+	
 	private String pid;
 	private String name;
 	private String password;
@@ -35,7 +42,7 @@ public class Professor extends AbstractEntity {
 		this.pid = pid;
 	}
 
-	@Column(name = "NAME")
+	@Column(name = COL_NAME)
 	public String getName() {
 		return name;
 	}
@@ -44,13 +51,13 @@ public class Professor extends AbstractEntity {
 		this.name = name;
 	}
 
-	@Column(name = "PID")
+	@Column(name = COL_PID)
 	@Id
 	public String getPid() {
 		return pid;
 	}
 
-	@Column(name = "PASSWORD")
+	@Column(name = COL_PASSWORD)
 	public String getPassword() {
 		return password;
 	}
@@ -70,9 +77,9 @@ public class Professor extends AbstractEntity {
 	@ManyToMany(targetEntity = Student.class, cascade = { CascadeType.PERSIST,
 			CascadeType.MERGE })
 	@JoinTable(
-			name = "PPreference",
-			joinColumns = @JoinColumn(name = "PID"),
-			inverseJoinColumns = @JoinColumn(name = "SID"))
+			name = PREFERENCETABLE,
+			joinColumns = @JoinColumn(name = COL_PID),
+			inverseJoinColumns = @JoinColumn(name = Student.COL_SID))
 	public List<Student> getPreferList() {
 		return preferList;
 	}
@@ -80,9 +87,9 @@ public class Professor extends AbstractEntity {
 	@ManyToMany(targetEntity = Student.class, cascade = { CascadeType.PERSIST,
 			CascadeType.MERGE })
 	@JoinTable(
-			name = "SPreference",
-			joinColumns = @JoinColumn(name = "PID"),
-			inverseJoinColumns = @JoinColumn(name = "SID"))
+			name = Student.PREFERENCETABLE,
+			joinColumns = @JoinColumn(name = COL_PID),
+			inverseJoinColumns = @JoinColumn(name = Student.COL_SID))
 	public Collection<Student> getLikedBy() {
 		return likedBy;
 	}

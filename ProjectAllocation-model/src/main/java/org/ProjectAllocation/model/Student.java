@@ -14,6 +14,13 @@ public class Student extends AbstractEntity {
 	 * 
 	 */
 	private static final long serialVersionUID = -8362624965122639740L;
+
+	public static final String TABLENAME = "Student";
+	public static final String COL_SID = "SID";
+	public static final String COL_NAME = "NAME";
+	public static final String COL_PASSWORD = "PASSWORD";
+	public static final String PREFERENCETABLE = "SPreference";
+
 	private String sid;
 	private String name;
 	private String password;
@@ -31,7 +38,7 @@ public class Student extends AbstractEntity {
 		this.likedBy = new HashSet<Professor>();
 	}
 
-	@Column(name = "NAME", length = 50)
+	@Column(name = COL_NAME, length = 50)
 	public String getName() {
 		return name;
 	}
@@ -40,13 +47,13 @@ public class Student extends AbstractEntity {
 		this.name = name;
 	}
 
-	@Column(name = "SID", unique = true)
+	@Column(name = COL_SID, unique = true)
 	@Id
 	public String getSid() {
 		return sid;
 	}
 
-	@Column(name = "PASSWORD", length = 50)
+	@Column(name = COL_PASSWORD, length = 50)
 	public String getPassword() {
 		return password;
 	}
@@ -62,9 +69,9 @@ public class Student extends AbstractEntity {
 	@ManyToMany(targetEntity = Professor.class, cascade = {
 			CascadeType.PERSIST, CascadeType.MERGE })
 	@JoinTable(
-			name = "SPreference",
-			joinColumns = @JoinColumn(name = "SID"),
-			inverseJoinColumns = @JoinColumn(name = "PID"))
+			name = PREFERENCETABLE,
+			joinColumns = @JoinColumn(name = COL_SID),
+			inverseJoinColumns = @JoinColumn(name = Professor.COL_PID))
 	public List<Professor> getPreferList() {
 		return preferList;
 	}
@@ -76,9 +83,9 @@ public class Student extends AbstractEntity {
 	@ManyToMany(targetEntity = Professor.class, cascade = {
 			CascadeType.PERSIST, CascadeType.MERGE })
 	@JoinTable(
-			name = "PPreference",
-			joinColumns = @JoinColumn(name = "SID"),
-			inverseJoinColumns = @JoinColumn(name = "PID"))
+			name = Professor.PREFERENCETABLE,
+			joinColumns = @JoinColumn(name = COL_SID),
+			inverseJoinColumns = @JoinColumn(name = Professor.COL_PID))
 	public Collection<Professor> getLikedBy() {
 		return likedBy;
 	}
