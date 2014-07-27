@@ -136,8 +136,7 @@ public class DatabaseTest extends TestCase {
 		session.save(s1);
 		tx.commit();
 		session.close();
-		sf = new Configuration().configure()
-		.buildSessionFactory();
+		sf = new Configuration().configure().buildSessionFactory();
 		session = sf.openSession();
 		tx = session.beginTransaction();
 		s1 = (Student) session.get(Student.class, "s1");
@@ -147,17 +146,40 @@ public class DatabaseTest extends TestCase {
 		assertTrue(s1.getPreferList().contains(p3));
 		assertTrue(p3.getLikedBy().contains(s1));
 		assertFalse(p1.getLikedBy().contains(s1));
-		assertEquals(s1.getName(),"tzxtzx");
+		assertEquals(s1.getName(), "tzxtzx");
 		tx.commit();
 		session.close();
 	}
 
 	public void testInsert() {
-
+		SessionFactory sf = new Configuration().configure()
+				.buildSessionFactory();
+		Session session = sf.openSession();
+		Transaction tx = session.beginTransaction();
+		Student s = (Student) session.get(Student.class, "s4");
+		assertEquals(s, null);
+		Professor p = (Professor) session.get(Professor.class, "p4");
+		assertEquals(s, null);
+		s = new Student("s4", "tzx4");
+		p = new Professor("p4", "haha4");
+		session.save(s);
+		session.save(p);
+		tx.commit();
+		session.close();
+		sf = new Configuration().configure()
+				.buildSessionFactory();
+		session = sf.openSession();
+		tx = session.beginTransaction();
+		s = (Student) session.get(Student.class, "s4");
+		assertNotNull(s);
+		p = (Professor) session.get(Professor.class, "p4");
+		assertNotNull(p);
+		tx.commit();
+		session.close();
 	}
 
 	public void testDelete() {
-
+		
 	}
 
 	public static void main(String[] arg) {
