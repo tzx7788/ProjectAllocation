@@ -57,16 +57,16 @@ public class DatabaseTest extends TestCase {
 
 	@Override
 	protected void tearDown() throws Exception {
-		SessionFactory sf = new Configuration().configure()
-				.buildSessionFactory();
-		Session session = sf.openSession();
-		Transaction tx = session.beginTransaction();
-		session.createSQLQuery("DELETE FROM Student").executeUpdate();
-		session.createSQLQuery("DELETE FROM Professor").executeUpdate();
-		session.createSQLQuery("DELETE FROM SPreference").executeUpdate();
-		session.createSQLQuery("DELETE FROM PPreference").executeUpdate();
-		tx.commit();
-		session.close();
+//		SessionFactory sf = new Configuration().configure()
+//				.buildSessionFactory();
+//		Session session = sf.openSession();
+//		Transaction tx = session.beginTransaction();
+//		session.createSQLQuery("DELETE FROM Student").executeUpdate();
+//		session.createSQLQuery("DELETE FROM Professor").executeUpdate();
+//		session.createSQLQuery("DELETE FROM SPreference").executeUpdate();
+//		session.createSQLQuery("DELETE FROM PPreference").executeUpdate();
+//		tx.commit();
+//		session.close();
 	}
 
 	public static void testSelect() {
@@ -186,6 +186,7 @@ public class DatabaseTest extends TestCase {
 		assertNotNull(s);
 		Professor p = (Professor) session.get(Professor.class, "p1");
 		assertNotNull(p);
+		s.getPreferList().remove(p);
 		session.delete(s);
 		session.delete(p);
 		tx.commit();
@@ -193,10 +194,12 @@ public class DatabaseTest extends TestCase {
 		sf = new Configuration().configure().buildSessionFactory();
 		session = sf.openSession();
 		tx = session.beginTransaction();
-		s = (Student) session.get(Student.class, "s4");
+		s = (Student) session.get(Student.class, "s1");
 		assertNull(s);
-		p = (Professor) session.get(Professor.class, "p4");
+		p = (Professor) session.get(Professor.class, "p1");
 		assertNull(p);
+		s = (Student) session.get(Student.class, "s2");
+		assertEquals(s.getPreferList().size(),0);
 		tx.commit();
 		session.close();
 	}

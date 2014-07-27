@@ -73,11 +73,12 @@ public class Student extends AbstractEntity {
 		this.preferList = preferList;
 	}
 
-	@ManyToMany(
-	        cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-	        mappedBy = "preferList",
-	        targetEntity = Professor.class
-	    )
+	@ManyToMany(targetEntity = Professor.class, cascade = {
+			CascadeType.PERSIST, CascadeType.MERGE })
+	@JoinTable(
+			name = "PPreference",
+			joinColumns = @JoinColumn(name = "SID"),
+			inverseJoinColumns = @JoinColumn(name = "PID"))
 	public Collection<Professor> getLikedBy() {
 		return likedBy;
 	}

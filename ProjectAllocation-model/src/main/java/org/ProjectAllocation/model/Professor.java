@@ -19,8 +19,9 @@ public class Professor extends AbstractEntity {
 	private String password;
 	private List<Student> preferList;
 	private Collection<Student> likedBy;
-	
-	public Professor() {}
+
+	public Professor() {
+	}
 
 	public Professor(String pid, String name) {
 		super();
@@ -66,8 +67,8 @@ public class Professor extends AbstractEntity {
 		this.likedBy = likedBy;
 	}
 
-	@ManyToMany(targetEntity = Student.class, cascade = {
-			CascadeType.PERSIST, CascadeType.MERGE })
+	@ManyToMany(targetEntity = Student.class, cascade = { CascadeType.PERSIST,
+			CascadeType.MERGE })
 	@JoinTable(
 			name = "PPreference",
 			joinColumns = @JoinColumn(name = "PID"),
@@ -76,15 +77,14 @@ public class Professor extends AbstractEntity {
 		return preferList;
 	}
 
-	@ManyToMany(
-	        cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-	        mappedBy = "preferList",
-	        targetEntity = Student.class
-	    )
+	@ManyToMany(targetEntity = Student.class, cascade = { CascadeType.PERSIST,
+			CascadeType.MERGE })
+	@JoinTable(
+			name = "SPreference",
+			joinColumns = @JoinColumn(name = "PID"),
+			inverseJoinColumns = @JoinColumn(name = "SID"))
 	public Collection<Student> getLikedBy() {
 		return likedBy;
 	}
-	
-	
 
 }
