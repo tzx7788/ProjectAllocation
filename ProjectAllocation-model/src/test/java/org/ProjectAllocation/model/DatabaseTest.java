@@ -166,8 +166,7 @@ public class DatabaseTest extends TestCase {
 		session.save(p);
 		tx.commit();
 		session.close();
-		sf = new Configuration().configure()
-				.buildSessionFactory();
+		sf = new Configuration().configure().buildSessionFactory();
 		session = sf.openSession();
 		tx = session.beginTransaction();
 		s = (Student) session.get(Student.class, "s4");
@@ -179,7 +178,27 @@ public class DatabaseTest extends TestCase {
 	}
 
 	public void testDelete() {
-		
+		SessionFactory sf = new Configuration().configure()
+				.buildSessionFactory();
+		Session session = sf.openSession();
+		Transaction tx = session.beginTransaction();
+		Student s = (Student) session.get(Student.class, "s1");
+		assertNotNull(s);
+		Professor p = (Professor) session.get(Professor.class, "p1");
+		assertNotNull(p);
+		session.delete(s);
+		session.delete(p);
+		tx.commit();
+		session.close();
+		sf = new Configuration().configure().buildSessionFactory();
+		session = sf.openSession();
+		tx = session.beginTransaction();
+		s = (Student) session.get(Student.class, "s4");
+		assertNull(s);
+		p = (Professor) session.get(Professor.class, "p4");
+		assertNull(p);
+		tx.commit();
+		session.close();
 	}
 
 	public static void main(String[] arg) {
