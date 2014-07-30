@@ -1,11 +1,12 @@
 package org.ProjectAllocation.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.*;
+
 
 @Entity
 public class Student extends AbstractEntity {
@@ -19,13 +20,12 @@ public class Student extends AbstractEntity {
 	public static final String COL_SID = "SID";
 	public static final String COL_NAME = "NAME";
 	public static final String COL_PASSWORD = "PASSWORD";
-	public static final String PREFERENCETABLE = "SPreference";
 
 	private String sid;
 	private String name;
 	private String password;
-	private List<Professor> preferList;
-	private Collection<Professor> likedBy;
+	private List<StudentPreferenceItem> preferList;
+	private Set<ProfessorPreferenceItem> likedBy;
 
 	public Student() {
 	}
@@ -34,8 +34,8 @@ public class Student extends AbstractEntity {
 		super();
 		this.sid = sid;
 		this.name = name;
-		this.preferList = new ArrayList<Professor>();
-		this.likedBy = new HashSet<Professor>();
+		this.preferList = new ArrayList<StudentPreferenceItem>();
+		this.likedBy = new HashSet<ProfessorPreferenceItem>();
 	}
 
 	@Column(name = COL_NAME, length = 50)
@@ -66,32 +66,39 @@ public class Student extends AbstractEntity {
 		this.password = password;
 	}
 
-	@ManyToMany(targetEntity = Professor.class, cascade = {
-			CascadeType.PERSIST, CascadeType.MERGE })
-	@JoinTable(
-			name = PREFERENCETABLE,
-			joinColumns = @JoinColumn(name = COL_SID),
-			inverseJoinColumns = @JoinColumn(name = Professor.COL_PID))
-	public List<Professor> getPreferList() {
+	@OneToMany(mappedBy="student",cascade=CascadeType.ALL)
+	@OrderBy("weight")
+	public List<StudentPreferenceItem> getPreferList() {
 		return preferList;
 	}
 
-	public void setPreferList(List<Professor> preferList) {
+	public void setPreferList(List<StudentPreferenceItem> preferList) {
 		this.preferList = preferList;
 	}
 
-	@ManyToMany(targetEntity = Professor.class, cascade = {
-			CascadeType.PERSIST, CascadeType.MERGE })
-	@JoinTable(
-			name = Professor.PREFERENCETABLE,
-			joinColumns = @JoinColumn(name = COL_SID),
-			inverseJoinColumns = @JoinColumn(name = Professor.COL_PID))
-	public Collection<Professor> getLikedBy() {
+	@OneToMany(mappedBy="student",cascade=CascadeType.ALL)
+	public Set<ProfessorPreferenceItem> getLikedBy() {
 		return likedBy;
 	}
 
-	public void setLikedBy(Collection<Professor> likedBy) {
+	public void setLikedBy(Set<ProfessorPreferenceItem> likedBy) {
 		this.likedBy = likedBy;
+	}
+	
+	public List<Professor> preferProfessorsList() {
+		ArrayList<Professor> result = new ArrayList<Professor>();
+		for (int index = 0; index < this.getPreferList().size(); index++)
+			result.add(this.getPreferList().get(index).getProfessor());
+		return result;
+	}
+	
+	public Set<Professor> likedByProfessorsSet() {
+		HashSet<Professor> result = new HashSet<Professor>();
+		for (ProfessorPreferenceItem item : this.getLikedBy()) {
+			Professor professor = item.getProfessor();
+			result.add(professor);
+		}
+		return result;
 	}
 
 }

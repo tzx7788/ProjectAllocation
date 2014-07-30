@@ -36,15 +36,30 @@ public class DatabaseTest extends TestCase {
 		Professor p1 = new Professor("p1", "haha1");
 		Professor p2 = new Professor("p2", "haha1");
 		Professor p3 = new Professor("p3", "haha1");
-		s1.getPreferList().add(p1);
-		s1.getPreferList().add(p2);
-		s2.getPreferList().add(p1);
-		s3.getPreferList().add(p3);
-		p1.getPreferList().add(s1);
-		p1.getPreferList().add(s3);
-		p2.getPreferList().add(s3);
-		p3.getPreferList().add(s2);
-		p3.getPreferList().add(s3);
+		session.save(s1);
+		session.save(s2);
+		session.save(s3);
+		session.save(p1);
+		session.save(p2);
+		session.save(p3);
+		StudentPreferenceItem sr1 = new StudentPreferenceItem(s1, p1);
+		StudentPreferenceItem sr2 = new StudentPreferenceItem(s1, p2);
+		StudentPreferenceItem sr3 = new StudentPreferenceItem(s2, p1);
+		StudentPreferenceItem sr4 = new StudentPreferenceItem(s3, p3);
+		s1.getPreferList().add(sr1);
+		s1.getPreferList().add(sr2);
+		s2.getPreferList().add(sr3);
+		s3.getPreferList().add(sr4);
+		ProfessorPreferenceItem pr1 = new ProfessorPreferenceItem(p1, s1);
+		ProfessorPreferenceItem pr2 = new ProfessorPreferenceItem(p1, s3);
+		ProfessorPreferenceItem pr3 = new ProfessorPreferenceItem(p2, s3);
+		ProfessorPreferenceItem pr4 = new ProfessorPreferenceItem(p3, s2);
+		ProfessorPreferenceItem pr5 = new ProfessorPreferenceItem(p3, s3);
+		p1.getPreferList().add(pr1);
+		p1.getPreferList().add(pr2);
+		p2.getPreferList().add(pr3);
+		p3.getPreferList().add(pr4);
+		p3.getPreferList().add(pr5);
 		session.save(s1);
 		session.save(s2);
 		session.save(s3);
@@ -57,16 +72,16 @@ public class DatabaseTest extends TestCase {
 
 	@Override
 	protected void tearDown() throws Exception {
-//		SessionFactory sf = new Configuration().configure()
-//				.buildSessionFactory();
-//		Session session = sf.openSession();
-//		Transaction tx = session.beginTransaction();
-//		session.createSQLQuery("DELETE FROM Student").executeUpdate();
-//		session.createSQLQuery("DELETE FROM Professor").executeUpdate();
-//		session.createSQLQuery("DELETE FROM SPreference").executeUpdate();
-//		session.createSQLQuery("DELETE FROM PPreference").executeUpdate();
-//		tx.commit();
-//		session.close();
+		// SessionFactory sf = new Configuration().configure()
+		// .buildSessionFactory();
+		// Session session = sf.openSession();
+		// Transaction tx = session.beginTransaction();
+		// session.createSQLQuery("DELETE FROM Student").executeUpdate();
+		// session.createSQLQuery("DELETE FROM Professor").executeUpdate();
+		// session.createSQLQuery("DELETE FROM SPreference").executeUpdate();
+		// session.createSQLQuery("DELETE FROM PPreference").executeUpdate();
+		// tx.commit();
+		// session.close();
 	}
 
 	public static void testSelect() {
@@ -80,24 +95,24 @@ public class DatabaseTest extends TestCase {
 		Professor p1 = (Professor) session.get(Professor.class, "p1");
 		Professor p2 = (Professor) session.get(Professor.class, "p2");
 		Professor p3 = (Professor) session.get(Professor.class, "p3");
-		assertTrue(s1.getLikedBy().contains(p1));
-		assertTrue(s2.getLikedBy().contains(p3));
-		assertTrue(s3.getLikedBy().contains(p1));
-		assertTrue(s3.getLikedBy().contains(p2));
-		assertTrue(s3.getLikedBy().contains(p3));
-		assertTrue(p1.getLikedBy().contains(s1));
-		assertTrue(p1.getLikedBy().contains(s2));
-		assertTrue(p2.getLikedBy().contains(s1));
-		assertTrue(p3.getLikedBy().contains(s3));
-		assertFalse(s1.getLikedBy().contains(p2));
-		assertFalse(s1.getLikedBy().contains(p3));
-		assertFalse(s2.getLikedBy().contains(p1));
-		assertFalse(s2.getLikedBy().contains(p2));
-		assertFalse(p1.getLikedBy().contains(s3));
-		assertFalse(p2.getLikedBy().contains(s2));
-		assertFalse(p2.getLikedBy().contains(s3));
-		assertFalse(p3.getLikedBy().contains(s1));
-		assertFalse(p3.getLikedBy().contains(s2));
+		assertTrue(s1.likedByProfessorsSet().contains(p1));
+		assertTrue(s2.likedByProfessorsSet().contains(p3));
+		assertTrue(s3.likedByProfessorsSet().contains(p1));
+		assertTrue(s3.likedByProfessorsSet().contains(p2));
+		assertTrue(s3.likedByProfessorsSet().contains(p3));
+		assertTrue(p1.likedByStudentsSet().contains(s1));
+		assertTrue(p1.likedByStudentsSet().contains(s2));
+		assertTrue(p2.likedByStudentsSet().contains(s1));
+		assertTrue(p3.likedByStudentsSet().contains(s3));
+		assertFalse(s1.likedByProfessorsSet().contains(p2));
+		assertFalse(s1.likedByProfessorsSet().contains(p3));
+		assertFalse(s2.likedByProfessorsSet().contains(p1));
+		assertFalse(s2.likedByProfessorsSet().contains(p2));
+		assertFalse(p1.likedByStudentsSet().contains(s3));
+		assertFalse(p2.likedByStudentsSet().contains(s2));
+		assertFalse(p2.likedByStudentsSet().contains(s3));
+		assertFalse(p3.likedByStudentsSet().contains(s1));
+		assertFalse(p3.likedByStudentsSet().contains(s2));
 		tx.commit();
 		session.close();
 	}
@@ -126,12 +141,25 @@ public class DatabaseTest extends TestCase {
 		Student s1 = (Student) session.get(Student.class, "s1");
 		Professor p1 = (Professor) session.get(Professor.class, "p1");
 		Professor p3 = (Professor) session.get(Professor.class, "p3");
-		s1.getPreferList().add(p3);
-		assertFalse(p3.getLikedBy().contains(s1));
-		p3.getLikedBy().add(s1);
-		assertTrue(p3.getLikedBy().contains(s1));
-		s1.getPreferList().remove(p1);
-		assertTrue(p1.getLikedBy().contains(s1));
+		StudentPreferenceItem sr = new StudentPreferenceItem(s1, p3);
+		s1.getPreferList().add(sr);
+		assertFalse(p3.likedByStudentsSet().contains(s1));
+		System.out.println("size " + s1.getPreferList().size());
+		for (int i = 0; i < s1.getPreferList().size(); i++)
+
+		{
+			StudentPreferenceItem item = s1.getPreferList().get(i);
+			if (item.getProfessor() == p1){
+				System.out.println("haha " + s1.getPreferList().get(i).getProfessor().getPid());
+				s1.getPreferList().remove(item);
+				item.getProfessor().getLikedBy().remove(item);
+				item.setStudent(null);
+				item.setProfessor(null);
+				session.delete(item);
+			}
+		}
+		System.out.println("size " + s1.getPreferList().size());
+		//assertTrue(p1.likedByStudentsSet().contains(s1));
 		s1.setName("tzxtzx");
 		session.save(s1);
 		tx.commit();
@@ -142,10 +170,9 @@ public class DatabaseTest extends TestCase {
 		s1 = (Student) session.get(Student.class, "s1");
 		p1 = (Professor) session.get(Professor.class, "p1");
 		p3 = (Professor) session.get(Professor.class, "p3");
-		System.out.println("size:" + p3.getLikedBy().size());
-		assertTrue(s1.getPreferList().contains(p3));
-		assertTrue(p3.getLikedBy().contains(s1));
-		assertFalse(p1.getLikedBy().contains(s1));
+		assertTrue(s1.preferProfessorsList().contains(p3));
+		assertTrue(p3.likedByStudentsSet().contains(s1));
+		assertFalse(p1.likedByStudentsSet().contains(s1));
 		assertEquals(s1.getName(), "tzxtzx");
 		tx.commit();
 		session.close();
@@ -186,9 +213,7 @@ public class DatabaseTest extends TestCase {
 		assertNotNull(s);
 		Professor p = (Professor) session.get(Professor.class, "p1");
 		assertNotNull(p);
-		s.getPreferList().remove(p);
 		session.delete(s);
-		session.delete(p);
 		tx.commit();
 		session.close();
 		sf = new Configuration().configure().buildSessionFactory();
@@ -197,48 +222,8 @@ public class DatabaseTest extends TestCase {
 		s = (Student) session.get(Student.class, "s1");
 		assertNull(s);
 		p = (Professor) session.get(Professor.class, "p1");
-		assertNull(p);
-		s = (Student) session.get(Student.class, "s2");
-		assertEquals(s.getPreferList().size(),0);
+		assertEquals(p.getPreferList().size(), 1);
 		tx.commit();
 		session.close();
-	}
-
-	public static void main(String[] arg) {
-
-		SessionFactory sf = new Configuration().configure()
-				.buildSessionFactory();
-		Session session = sf.openSession();
-		Transaction tx = session.beginTransaction();
-		session.createSQLQuery("DELETE FROM Student").executeUpdate();
-		session.createSQLQuery("DELETE FROM Professor").executeUpdate();
-		session.createSQLQuery("DELETE FROM SPreference").executeUpdate();
-		session.createSQLQuery("DELETE FROM PPreference").executeUpdate();
-		Student s1 = new Student("s1", "tzx1");
-		Student s2 = new Student("s2", "tzx2");
-		Student s3 = new Student("s3", "tzx3");
-		Professor p1 = new Professor("p1", "haha1");
-		Professor p2 = new Professor("p2", "haha1");
-		Professor p3 = new Professor("p3", "haha1");
-		s1.getPreferList().add(p1);
-		s1.getPreferList().add(p2);
-		s2.getPreferList().add(p1);
-		s3.getPreferList().add(p3);
-		p1.getPreferList().add(s1);
-		p1.getPreferList().add(s3);
-		p2.getPreferList().add(s3);
-		p3.getPreferList().add(s2);
-		p3.getPreferList().add(s3);
-		session.save(s1);
-		session.save(s2);
-		session.save(s3);
-		session.save(p1);
-		session.save(p2);
-		session.save(p3);
-		Student s = (Student) session.get(Student.class, "s1");
-		System.out.println("ll:" + s.getName());
-		tx.commit();
-		session.close();
-		System.out.println("finished");
 	}
 }

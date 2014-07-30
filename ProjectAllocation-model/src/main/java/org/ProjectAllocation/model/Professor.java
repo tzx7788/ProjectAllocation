@@ -1,9 +1,9 @@
 package org.ProjectAllocation.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.*;
 
@@ -14,18 +14,17 @@ public class Professor extends AbstractEntity {
 	 * 
 	 */
 	private static final long serialVersionUID = 1141185595926572529L;
-	
+
 	public static final String TABLENAME = "Professor";
 	public static final String COL_PID = "PID";
 	public static final String COL_NAME = "NAME";
 	public static final String COL_PASSWORD = "PASSWORD";
-	public static final String PREFERENCETABLE = "PPreference";
-	
+
 	private String pid;
 	private String name;
 	private String password;
-	private List<Student> preferList;
-	private Collection<Student> likedBy;
+	private List<ProfessorPreferenceItem> preferList;
+	private Set<StudentPreferenceItem> likedBy;
 
 	public Professor() {
 	}
@@ -34,8 +33,8 @@ public class Professor extends AbstractEntity {
 		super();
 		this.pid = pid;
 		this.name = name;
-		this.preferList = new ArrayList<Student>();
-		this.likedBy = new HashSet<Student>();
+		this.preferList = new ArrayList<ProfessorPreferenceItem>();
+		this.likedBy = new HashSet<StudentPreferenceItem>();
 	}
 
 	public void setPid(String pid) {
@@ -66,32 +65,39 @@ public class Professor extends AbstractEntity {
 		this.password = password;
 	}
 
-	public void setPreferList(List<Student> preferList) {
+	public void setPreferList(List<ProfessorPreferenceItem> preferList) {
 		this.preferList = preferList;
 	}
 
-	public void setLikedBy(Collection<Student> likedBy) {
+	public void setLikedBy(Set<StudentPreferenceItem> likedBy) {
 		this.likedBy = likedBy;
 	}
 
-	@ManyToMany(targetEntity = Student.class, cascade = { CascadeType.PERSIST,
-			CascadeType.MERGE })
-	@JoinTable(
-			name = PREFERENCETABLE,
-			joinColumns = @JoinColumn(name = COL_PID),
-			inverseJoinColumns = @JoinColumn(name = Student.COL_SID))
-	public List<Student> getPreferList() {
+	@OneToMany(mappedBy = "professor", cascade = CascadeType.ALL)
+	@OrderBy("weight")
+	public List<ProfessorPreferenceItem> getPreferList() {
 		return preferList;
 	}
 
-	@ManyToMany(targetEntity = Student.class, cascade = { CascadeType.PERSIST,
-			CascadeType.MERGE })
-	@JoinTable(
-			name = Student.PREFERENCETABLE,
-			joinColumns = @JoinColumn(name = COL_PID),
-			inverseJoinColumns = @JoinColumn(name = Student.COL_SID))
-	public Collection<Student> getLikedBy() {
+	@OneToMany(mappedBy = "professor", cascade = CascadeType.ALL)
+	public Set<StudentPreferenceItem> getLikedBy() {
 		return likedBy;
+	}
+
+	public List<Student>preferStudentsList() {
+		ArrayList<Student> result = new ArrayList<Student>();
+		for (int index = 0; index < this.getPreferList().size(); index++)
+			result.add(this.getPreferList().get(index).getStudent());
+		return result;
+	}
+	
+	public Set<Student> likedByStudentsSet() {
+		HashSet<Student> result = new HashSet<Student>();
+		for (StudentPreferenceItem item : this.getLikedBy()) {
+			Student student = item.getStudent();
+			result.add(student);
+		}
+		return result;
 	}
 
 }
