@@ -15,18 +15,21 @@ public class StudentPreferenceItem extends AbstractEntity {
 	public static final String COL_PID = "PID";
 	public static final String COL_SID = "SID";
 	public static final String COL_WEIGHT = "WEIGHT";
+	public static final String COL_PKEY = "PKEY";
 
 	private Professor professor;
 	private Student student;
 	private Integer weight;
+	private Integer key;
 
 	public StudentPreferenceItem() {
 	}
 	
-	public StudentPreferenceItem(Student student, Professor professor) {
+	public StudentPreferenceItem(Student student, Professor professor, Integer weight) {
 		super();
 		this.professor = professor;
 		this.student = student;
+		this.weight = weight;
 	}
 
 	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
@@ -50,8 +53,6 @@ public class StudentPreferenceItem extends AbstractEntity {
 	}
 
 	@Column(name = COL_WEIGHT)
-	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
 	public Integer getWeight() {
 		return weight;
 	}
@@ -59,4 +60,17 @@ public class StudentPreferenceItem extends AbstractEntity {
 	public void setWeight(Integer weight) {
 		this.weight = weight;
 	}
+
+	@Column(name = COL_PKEY)
+	@Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+	public Integer getKey() {
+		return key;
+	}
+
+	public void setKey(Integer key) {
+		this.key = key;
+	}
+	
+	
 }

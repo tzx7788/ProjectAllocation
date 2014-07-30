@@ -42,19 +42,19 @@ public class DatabaseTest extends TestCase {
 		session.save(p1);
 		session.save(p2);
 		session.save(p3);
-		StudentPreferenceItem sr1 = new StudentPreferenceItem(s1, p1);
-		StudentPreferenceItem sr2 = new StudentPreferenceItem(s1, p2);
-		StudentPreferenceItem sr3 = new StudentPreferenceItem(s2, p1);
-		StudentPreferenceItem sr4 = new StudentPreferenceItem(s3, p3);
+		StudentPreferenceItem sr1 = new StudentPreferenceItem(s1, p1, 0);
+		StudentPreferenceItem sr2 = new StudentPreferenceItem(s1, p2, 1);
+		StudentPreferenceItem sr3 = new StudentPreferenceItem(s2, p1, 2);
+		StudentPreferenceItem sr4 = new StudentPreferenceItem(s3, p3, 3);
 		s1.getPreferList().add(sr1);
 		s1.getPreferList().add(sr2);
 		s2.getPreferList().add(sr3);
 		s3.getPreferList().add(sr4);
-		ProfessorPreferenceItem pr1 = new ProfessorPreferenceItem(p1, s1);
-		ProfessorPreferenceItem pr2 = new ProfessorPreferenceItem(p1, s3);
-		ProfessorPreferenceItem pr3 = new ProfessorPreferenceItem(p2, s3);
-		ProfessorPreferenceItem pr4 = new ProfessorPreferenceItem(p3, s2);
-		ProfessorPreferenceItem pr5 = new ProfessorPreferenceItem(p3, s3);
+		ProfessorPreferenceItem pr1 = new ProfessorPreferenceItem(p1, s1, 0);
+		ProfessorPreferenceItem pr2 = new ProfessorPreferenceItem(p1, s3, 1);
+		ProfessorPreferenceItem pr3 = new ProfessorPreferenceItem(p2, s3, 2);
+		ProfessorPreferenceItem pr4 = new ProfessorPreferenceItem(p3, s2, 3);
+		ProfessorPreferenceItem pr5 = new ProfessorPreferenceItem(p3, s3, 4);
 		p1.getPreferList().add(pr1);
 		p1.getPreferList().add(pr2);
 		p2.getPreferList().add(pr3);
@@ -141,7 +141,7 @@ public class DatabaseTest extends TestCase {
 		Student s1 = (Student) session.get(Student.class, "s1");
 		Professor p1 = (Professor) session.get(Professor.class, "p1");
 		Professor p3 = (Professor) session.get(Professor.class, "p3");
-		StudentPreferenceItem sr = new StudentPreferenceItem(s1, p3);
+		StudentPreferenceItem sr = new StudentPreferenceItem(s1, p3, 4);
 		s1.getPreferList().add(sr);
 		assertFalse(p3.likedByStudentsSet().contains(s1));
 		System.out.println("size " + s1.getPreferList().size());
@@ -149,8 +149,9 @@ public class DatabaseTest extends TestCase {
 
 		{
 			StudentPreferenceItem item = s1.getPreferList().get(i);
-			if (item.getProfessor() == p1){
-				System.out.println("haha " + s1.getPreferList().get(i).getProfessor().getPid());
+			if (item.getProfessor() == p1) {
+				System.out.println("haha "
+						+ s1.getPreferList().get(i).getProfessor().getPid());
 				s1.getPreferList().remove(item);
 				item.getProfessor().getLikedBy().remove(item);
 				item.setStudent(null);
@@ -159,7 +160,7 @@ public class DatabaseTest extends TestCase {
 			}
 		}
 		System.out.println("size " + s1.getPreferList().size());
-		//assertTrue(p1.likedByStudentsSet().contains(s1));
+		// assertTrue(p1.likedByStudentsSet().contains(s1));
 		s1.setName("tzxtzx");
 		session.save(s1);
 		tx.commit();
@@ -223,6 +224,23 @@ public class DatabaseTest extends TestCase {
 		assertNull(s);
 		p = (Professor) session.get(Professor.class, "p1");
 		assertEquals(p.getPreferList().size(), 1);
+		tx.commit();
+		session.close();
+	}
+
+	public void testSort() {
+		SessionFactory sf = new Configuration().configure()
+				.buildSessionFactory();
+		Session session = sf.openSession();
+		Transaction tx = session.beginTransaction();
+		Student s = (Student) session.get(Student.class, "s1");
+		Integer weight = s.getPreferList().get(1).getWeight();
+		s.getPreferList().get(1).setWeight(s.getPreferList().get(0).getWeight());
+		s.getPreferList().get(0).setWeight(weight);
+		StudentPreferenceItem item = s.getPreferList().get(0);
+		s.getPreferList().remove(item);
+		s.getPreferList().add(item);
+		session.save(s);
 		tx.commit();
 		session.close();
 	}
