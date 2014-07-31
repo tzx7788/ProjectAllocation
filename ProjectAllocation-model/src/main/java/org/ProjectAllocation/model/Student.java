@@ -1,11 +1,15 @@
 package org.ProjectAllocation.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.*;
+
+import net.sf.json.JSONObject;
 
 
 @Entity
@@ -99,6 +103,14 @@ public class Student extends AbstractEntity {
 			result.add(professor);
 		}
 		return result;
+	}
+
+	@Override
+	public String toJSONString() {
+		Map<String, String> result = new HashMap<String, String>();
+		result.put("sid", this.getSid());
+		result.put("name", this.getName());
+		return JSONObject.fromObject(result).toString();
 	}
 
 }

@@ -13,4 +13,9 @@ public interface StudentService {
     @GET
     @Produces( { MediaType.APPLICATION_JSON } )
     String getInformationFromSID( @PathParam( "sid" ) String sid );
+    
+    @Path( "preferenceList/{sid}")
+    @GET
+    @Produces( { MediaType.APPLICATION_JSON } )
+    String getPreferenceListFromSID( @PathParam( "sid" ) String sid );
 }

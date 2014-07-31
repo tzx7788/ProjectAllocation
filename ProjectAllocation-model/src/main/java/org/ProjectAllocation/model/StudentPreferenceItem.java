@@ -1,6 +1,11 @@
 package org.ProjectAllocation.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.persistence.*;
+
+import net.sf.json.JSONObject;
 
 @Entity
 @Table(name = StudentPreferenceItem.TABLENAME)
@@ -72,5 +77,13 @@ public class StudentPreferenceItem extends AbstractEntity {
 		this.key = key;
 	}
 	
+	@Override
+	public String toJSONString() {
+		Map<String, String> result = new HashMap<String, String>();
+		result.put("sid", this.getStudent().getSid());
+		result.put("pid", this.getStudent().getSid());
+		result.put("weight", this.getWeight().toString());
+		return JSONObject.fromObject(result).toString();
+	}
 	
 }

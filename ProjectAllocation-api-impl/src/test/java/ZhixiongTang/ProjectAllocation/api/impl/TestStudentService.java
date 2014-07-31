@@ -4,8 +4,10 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.ProjectAllocation.model.Professor;
 import org.ProjectAllocation.model.Student;
 import org.apache.catalina.Context;
 import org.apache.catalina.deploy.ApplicationParameter;
@@ -72,7 +74,7 @@ public class TestStudentService {
 	}
 
 	@Test
-	public void testSayHello() {
+	public void testGetInformation() {
 		StudentService service = JAXRSClientFactory.create("http://localhost:"
 				+ port + "/" + getRestServicesPath() + "/services/",
 				StudentService.class);
@@ -88,9 +90,35 @@ public class TestStudentService {
 		Student s = list.get(0);
 		tx.commit();
 		session.close();
-		JSONObject jsonObject = JSONObject.fromObject( service.getInformationFromSID("s1") ); 
+		JSONObject jsonObject = JSONObject.fromObject(service
+				.getInformationFromSID("s1"));
 		assertEquals(s.getSid().toString(), jsonObject.get("sid"));
 		assertEquals(s.getName().toString(), jsonObject.get("name"));
 	}
 
+	@Test
+	public void testGetPreferenceList() {
+		StudentService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				StudentService.class);
+		SessionFactory sf = new Configuration().configure()
+				.buildSessionFactory();
+		Session session = sf.openSession();
+		Transaction tx = session.beginTransaction();
+		String hql = "from Student where SID=:sid";
+		Query query = session.createQuery(hql);
+		query.setString("sid", "s1");
+		Student s = (Student) query.list().get(0);
+		List<Professor> list = s.preferProfessorsList();
+		tx.commit();
+		session.close();
+		JSONArray array = JSONArray.fromObject(service
+				.getPreferenceListFromSID("s1"));
+		assertEquals(list.size(), array.size());
+		for (int index = 0; index < list.size(); index++) {
+			System.out.println(array.getJSONObject(index).get("pid"));
+			assertEquals(list.get(index).getPid().toString(), array.getJSONObject(index).get("pid"));
+			assertEquals(list.get(index).getName().toString(), array.getJSONObject(index).get("name"));
+		}
+	}
 }

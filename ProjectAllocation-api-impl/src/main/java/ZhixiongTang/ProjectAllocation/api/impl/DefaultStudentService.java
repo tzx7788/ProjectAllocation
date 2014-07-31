@@ -1,11 +1,11 @@
 package ZhixiongTang.ProjectAllocation.api.impl;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import net.sf.json.JSONObject;
+import net.sf.json.JSONArray;
 
+import org.ProjectAllocation.model.Professor;
 import org.ProjectAllocation.model.Student;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -30,12 +30,33 @@ public class DefaultStudentService implements
 		List<Student> list = query.list();
 		tx.commit();
 		session.close();
-		if (list.size() == 0) return "haha";
+		if (list.size() == 0)
+			return "haha";
 		Student s = list.get(0);
-		Map<String, String> result = new HashMap<String, String>();
-		result.put("sid", s.getSid());
-		result.put("name", s.getName());
-		return JSONObject.fromObject( result ).toString();
+		return s.toJSONString();
 	}
 
+	public String getPreferenceListFromSID(String sid) {
+		SessionFactory sf = new Configuration().configure()
+				.buildSessionFactory();
+		Session session = sf.openSession();
+		Transaction tx = session.beginTransaction();
+		String hql = "from Student where SID=:sid";
+		Query query = session.createQuery(hql);
+		query.setString("sid", sid);
+		if (query.list().size() == 0) {
+			tx.commit();
+			session.close();
+			return "haha";
+		}
+		Student s = (Student) query.list().get(0);
+		List<Professor> list = s.preferProfessorsList();
+		tx.commit();
+		session.close();
+		List<String> result = new ArrayList<String>();
+		for (Professor professor : list) {
+			result.add(professor.toJSONString());
+		}
+		return JSONArray.fromObject(result).toString();
+	}
 }
