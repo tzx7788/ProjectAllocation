@@ -31,7 +31,7 @@ import javax.ws.rs.core.MediaType;
 @Path( "HelloService" )
 public interface HelloService
 {
-    @Path( "sayHelllo/{who}" )
+    @Path( "sayHello/{who}" )
     @GET
     @Produces( { MediaType.TEXT_PLAIN } )
     String sayHello( @PathParam( "who" ) String who );

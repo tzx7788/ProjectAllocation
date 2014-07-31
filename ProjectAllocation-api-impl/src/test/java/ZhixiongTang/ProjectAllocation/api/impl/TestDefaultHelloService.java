@@ -96,6 +96,16 @@ public class TestDefaultHelloService
             JAXRSClientFactory.create( "http://localhost:" + port + "/" + getRestServicesPath() + "/testServices/",
                                        HelloService.class );
         String who = "foo";
-        assertEquals( "Hellkjlo "+who, service.sayHello( who ) );
+        assertEquals( "Hellkjlo tzx1"+who, service.sayHello( who ) );
+    }
+    
+    @Test
+    public void testfadsf()
+    {
+    	HelloService service =
+            JAXRSClientFactory.create( "http://localhost:" + port + "/" + getRestServicesPath() + "/testServices/",
+                                       HelloService.class );
+        String who = "foo";
+        assertEquals( service.playGame( who ), service.playGame( who ) );
     }
 }

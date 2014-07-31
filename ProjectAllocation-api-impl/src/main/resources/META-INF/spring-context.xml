@@ -35,5 +35,10 @@
 		</jaxrs:serviceBeans>
 
 	</jaxrs:server>
+	<jaxrs:server id="services" address="/services">
+		<jaxrs:serviceBeans>
+			<ref bean="studentService#default" />
+		</jaxrs:serviceBeans>
+	</jaxrs:server>
 
 </beans>

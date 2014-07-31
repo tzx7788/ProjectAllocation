@@ -22,22 +22,30 @@ package ZhixiongTang.ProjectAllocation.api.impl;
 import ZhixiongTang.ProjectAllocation.api.HelloService;
 
 import org.ProjectAllocation.model.App;
+import org.ProjectAllocation.model.Student;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Service;
 
 /**
  * @author Olivier Lamy
  */
-@Service( "helloService#default" )
-public class DefaultHelloService
-    implements HelloService
-{
-    public String sayHello( String who )
-    {
-        return "Hellkjlo " + who;
-    }
-    
-    public String playGame( String game )
-    {
-    	return App.play(game);
-    }
+@Service("helloService#default")
+public class DefaultHelloService implements HelloService {
+	public String sayHello(String who) {
+		SessionFactory sf = new Configuration().configure()
+				.buildSessionFactory();
+		Session session = sf.openSession();
+		Transaction tx = session.beginTransaction();
+		Student s = (Student) session.get(Student.class,"s1");
+		tx.commit();
+		session.close();
+		return "Hellkjlo " + s.getName() + who;
+	}
+
+	public String playGame(String game) {
+		return App.play(game);
+	}
 }
