@@ -104,12 +104,12 @@ public class Professor extends AbstractEntity {
 		return result;
 	}
 	
-	@Override
 	public String toJSONString() {
 		Map<String, String> result = new HashMap<String, String>();
 		result.put("pid", this.getPid());
 		result.put("name", this.getName());
 		return JSONObject.fromObject(result).toString();
 	}
+
 
 }

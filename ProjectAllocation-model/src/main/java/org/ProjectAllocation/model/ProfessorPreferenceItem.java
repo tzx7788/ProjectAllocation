@@ -77,7 +77,6 @@ public class ProfessorPreferenceItem extends AbstractEntity {
 		this.key = key;
 	}
 	
-	@Override
 	public String toJSONString() {
 		Map<String, String> result = new HashMap<String, String>();
 		result.put("sid", this.getStudent().getSid());

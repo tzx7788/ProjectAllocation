@@ -105,7 +105,6 @@ public class Student extends AbstractEntity {
 		return result;
 	}
 
-	@Override
 	public String toJSONString() {
 		Map<String, String> result = new HashMap<String, String>();
 		result.put("sid", this.getSid());

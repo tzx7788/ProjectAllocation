@@ -92,6 +92,11 @@ public class TestStudentService {
 		session.close();
 		JSONObject jsonObject = JSONObject.fromObject(service
 				.getInformationFromSID("s1"));
+		System.out.print(service
+				.getInformationFromSID("s1"));
+		System.out.print(service
+				.getPreferenceListFromSID("s1"));
+		jsonObject = JSONObject.fromObject(jsonObject.get("data"));
 		assertEquals(s.getSid().toString(), jsonObject.get("sid"));
 		assertEquals(s.getName().toString(), jsonObject.get("name"));
 	}
@@ -112,8 +117,9 @@ public class TestStudentService {
 		List<Professor> list = s.preferProfessorsList();
 		tx.commit();
 		session.close();
-		JSONArray array = JSONArray.fromObject(service
+		JSONObject jsonObject = JSONObject.fromObject(service
 				.getPreferenceListFromSID("s1"));
+		JSONArray array = jsonObject.getJSONArray("data");
 		assertEquals(list.size(), array.size());
 		for (int index = 0; index < list.size(); index++) {
 			System.out.println(array.getJSONObject(index).get("pid"));

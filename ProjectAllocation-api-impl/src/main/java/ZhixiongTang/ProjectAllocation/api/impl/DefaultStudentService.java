@@ -30,10 +30,15 @@ public class DefaultStudentService implements
 		List<Student> list = query.list();
 		tx.commit();
 		session.close();
-		if (list.size() == 0)
-			return "haha";
-		Student s = list.get(0);
-		return s.toJSONString();
+		if (list.size() == 0) {
+			Error error = new Error("No student found!");
+			State state = new State(error.toJSONString());
+			return state.toJSONString();
+		} else {
+			Student s = list.get(0);
+			State state = new State(s.toJSONString());
+			return state.toJSONString();
+		}
 	}
 
 	public String getPreferenceListFromSID(String sid) {
@@ -47,16 +52,20 @@ public class DefaultStudentService implements
 		if (query.list().size() == 0) {
 			tx.commit();
 			session.close();
-			return "haha";
+			Error error = new Error("No student found!");
+			State state = new State(error.toJSONString());
+			return state.toJSONString();
+		} else {
+			Student s = (Student) query.list().get(0);
+			List<Professor> list = s.preferProfessorsList();
+			tx.commit();
+			session.close();
+			List<String> result = new ArrayList<String>();
+			for (Professor professor : list) {
+				result.add(professor.toJSONString());
+			}
+			State state = new State(JSONArray.fromObject(result).toString());
+			return state.toJSONString();
 		}
-		Student s = (Student) query.list().get(0);
-		List<Professor> list = s.preferProfessorsList();
-		tx.commit();
-		session.close();
-		List<String> result = new ArrayList<String>();
-		for (Professor professor : list) {
-			result.add(professor.toJSONString());
-		}
-		return JSONArray.fromObject(result).toString();
 	}
 }
