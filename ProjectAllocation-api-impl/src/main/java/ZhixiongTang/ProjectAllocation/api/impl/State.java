@@ -1,30 +1,37 @@
 package ZhixiongTang.ProjectAllocation.api.impl;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.ProjectAllocation.model.JSONInterface;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import net.sf.json.JSONObject;
-import net.sf.json.JSONString;
+public class State extends JSONObject {
 
-public class State implements JSONString {
 
-	String data;
-	String status;
-
-	public State(String data) {
-		if (data.getClass().equals(Error.class)) {
-			status = "success";
+	public State(JSONInterface data) {
+		super();
+		if (data.getClass() != Error.class) {
+			this.put("status", "success");
 		} else {
-			status = "fail";
+			this.put("status", "fail");
 		}
-		this.data = data;
+		this.initWithJSONObject(data.toJSONObject());
+	}
+	
+	public State(JSONObject data) {
+		this.put("status", "success");
+		this.initWithJSONObject(data);
+	}
+	
+	public State(JSONArray data) {
+		this.put("status", "success");
+		this.initWithJSONArray(data);
+	}
+	
+	private void initWithJSONObject(JSONObject obj) {
+		this.put("data",obj);
 	}
 
-	public String toJSONString() {
-		Map<String, String> result = new HashMap<String, String>();
-		result.put("status", status);
-		result.put("data", data);
-		return JSONObject.fromObject(result).toString();
+	private void initWithJSONArray(JSONArray array) {
+		this.put("data",array);
 	}
-
 }

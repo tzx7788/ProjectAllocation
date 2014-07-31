@@ -1,9 +1,6 @@
 package ZhixiongTang.ProjectAllocation.api.impl;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import net.sf.json.JSONArray;
 
 import org.ProjectAllocation.model.Professor;
 import org.ProjectAllocation.model.Student;
@@ -12,6 +9,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.json.JSONArray;
 import org.springframework.stereotype.Service;
 
 @Service("studentService#default")
@@ -32,12 +30,12 @@ public class DefaultStudentService implements
 		session.close();
 		if (list.size() == 0) {
 			Error error = new Error("No student found!");
-			State state = new State(error.toJSONString());
-			return state.toJSONString();
+			State state = new State(error);
+			return state.toString();
 		} else {
 			Student s = list.get(0);
-			State state = new State(s.toJSONString());
-			return state.toJSONString();
+			State state = new State(s);
+			return state.toString();
 		}
 	}
 
@@ -53,19 +51,19 @@ public class DefaultStudentService implements
 			tx.commit();
 			session.close();
 			Error error = new Error("No student found!");
-			State state = new State(error.toJSONString());
-			return state.toJSONString();
+			State state = new State(error);
+			return state.toString();
 		} else {
 			Student s = (Student) query.list().get(0);
 			List<Professor> list = s.preferProfessorsList();
 			tx.commit();
 			session.close();
-			List<String> result = new ArrayList<String>();
+			JSONArray result = new JSONArray();
 			for (Professor professor : list) {
-				result.add(professor.toJSONString());
+				result.put(professor.toJSONObject());
 			}
-			State state = new State(JSONArray.fromObject(result).toString());
-			return state.toJSONString();
+			State state = new State(result);
+			return state.toString();
 		}
 	}
 }

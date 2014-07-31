@@ -1,12 +1,10 @@
 package ZhixiongTang.ProjectAllocation.api.impl;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.ProjectAllocation.model.JSONInterface;
+import org.json.JSONObject;
 
-import net.sf.json.JSONObject;
-import net.sf.json.JSONString;
 
-public class Error implements JSONString {
+public class Error implements JSONInterface {
 	protected String msg;
 
 	public Error(String msg) {
@@ -21,10 +19,10 @@ public class Error implements JSONString {
 		this.msg = msg;
 	}
 
-	public String toJSONString() {
-		Map<String, String> result = new HashMap<String, String>();
+	public JSONObject toJSONObject() {
+		JSONObject result = new JSONObject();
 		result.put("msg",msg);
-		return JSONObject.fromObject(result).toString();
+		return result;
 	}
 	
 }

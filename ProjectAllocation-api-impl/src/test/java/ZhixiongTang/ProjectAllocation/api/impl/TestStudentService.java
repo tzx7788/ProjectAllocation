@@ -4,9 +4,6 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import org.ProjectAllocation.model.Professor;
 import org.ProjectAllocation.model.Student;
 import org.apache.catalina.Context;
@@ -19,6 +16,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,13 +89,13 @@ public class TestStudentService {
 		Student s = list.get(0);
 		tx.commit();
 		session.close();
-		JSONObject jsonObject = JSONObject.fromObject(service
+		JSONObject jsonObject = new JSONObject(service
 				.getInformationFromSID("s1"));
 		System.out.print(service
 				.getInformationFromSID("s1"));
 		System.out.print(service
 				.getPreferenceListFromSID("s1"));
-		jsonObject = JSONObject.fromObject(jsonObject.get("data"));
+		jsonObject = jsonObject.getJSONObject("data");
 		assertEquals(s.getSid().toString(), jsonObject.get("sid"));
 		assertEquals(s.getName().toString(), jsonObject.get("name"));
 	}
@@ -117,10 +116,10 @@ public class TestStudentService {
 		List<Professor> list = s.preferProfessorsList();
 		tx.commit();
 		session.close();
-		JSONObject jsonObject = JSONObject.fromObject(service
+		JSONObject jsonObject = new JSONObject(service
 				.getPreferenceListFromSID("s1"));
 		JSONArray array = jsonObject.getJSONArray("data");
-		assertEquals(list.size(), array.size());
+		assertEquals(list.size(), array.length());
 		for (int index = 0; index < list.size(); index++) {
 			System.out.println(array.getJSONObject(index).get("pid"));
 			assertEquals(list.get(index).getPid().toString(), array.getJSONObject(index).get("pid"));
