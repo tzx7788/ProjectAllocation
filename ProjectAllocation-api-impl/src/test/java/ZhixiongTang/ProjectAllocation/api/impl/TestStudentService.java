@@ -8,7 +8,9 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 
 import org.ProjectAllocation.model.Professor;
+import org.ProjectAllocation.model.ProfessorPreferenceItem;
 import org.ProjectAllocation.model.Student;
+import org.ProjectAllocation.model.StudentPreferenceItem;
 import org.apache.catalina.Context;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.startup.Tomcat;
@@ -27,7 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.springframework.web.context.ContextLoaderListener;  
+import org.springframework.web.context.ContextLoaderListener;
 
 import ZhixiongTang.ProjectAllocation.api.StudentService;
 
@@ -61,6 +63,52 @@ public class TestStudentService {
 		port = tomcat.getConnector().getLocalPort();
 
 		System.out.println("Tomcat started on port:" + port);
+		SessionFactory sf = new Configuration().configure()
+				.buildSessionFactory();
+		Session session = sf.openSession();
+		Transaction tx = session.beginTransaction();
+		session.createSQLQuery("DELETE FROM Student").executeUpdate();
+		session.createSQLQuery("DELETE FROM Professor").executeUpdate();
+		session.createSQLQuery("DELETE FROM SPreference").executeUpdate();
+		session.createSQLQuery("DELETE FROM PPreference").executeUpdate();
+		Student s1 = new Student("s1", "tzx1");
+		Student s2 = new Student("s2", "tzx2");
+		Student s3 = new Student("s3", "tzx3");
+		Professor p1 = new Professor("p1", "haha1");
+		Professor p2 = new Professor("p2", "haha1");
+		Professor p3 = new Professor("p3", "haha1");
+		session.save(s1);
+		session.save(s2);
+		session.save(s3);
+		session.save(p1);
+		session.save(p2);
+		session.save(p3);
+		StudentPreferenceItem sr1 = new StudentPreferenceItem(s1, p1, 0);
+		StudentPreferenceItem sr2 = new StudentPreferenceItem(s1, p2, 1);
+		StudentPreferenceItem sr3 = new StudentPreferenceItem(s2, p1, 2);
+		StudentPreferenceItem sr4 = new StudentPreferenceItem(s3, p3, 3);
+		s1.getPreferList().add(sr1);
+		s1.getPreferList().add(sr2);
+		s2.getPreferList().add(sr3);
+		s3.getPreferList().add(sr4);
+		ProfessorPreferenceItem pr1 = new ProfessorPreferenceItem(p1, s1, 0);
+		ProfessorPreferenceItem pr2 = new ProfessorPreferenceItem(p1, s3, 1);
+		ProfessorPreferenceItem pr3 = new ProfessorPreferenceItem(p2, s3, 2);
+		ProfessorPreferenceItem pr4 = new ProfessorPreferenceItem(p3, s2, 3);
+		ProfessorPreferenceItem pr5 = new ProfessorPreferenceItem(p3, s3, 4);
+		p1.getPreferList().add(pr1);
+		p1.getPreferList().add(pr2);
+		p2.getPreferList().add(pr3);
+		p3.getPreferList().add(pr4);
+		p3.getPreferList().add(pr5);
+		session.save(s1);
+		session.save(s2);
+		session.save(s3);
+		session.save(p1);
+		session.save(p2);
+		session.save(p3);
+		tx.commit();
+		session.close();
 	}
 
 	@After
@@ -95,7 +143,7 @@ public class TestStudentService {
 		session.close();
 		Response response = service.getInformationFromSID("s1");
 		System.out.println(response.getMetadata());
-		InputStream	 inputStream = (InputStream)response.getEntity();
+		InputStream inputStream = (InputStream) response.getEntity();
 		String theString = null;
 		try {
 			theString = IOUtils.toString(inputStream);
@@ -126,7 +174,7 @@ public class TestStudentService {
 		session.close();
 		Response response = service.getPreferenceListFromSID("s1");
 		System.out.println(response.getMetadata());
-		InputStream	 inputStream = (InputStream)response.getEntity();
+		InputStream inputStream = (InputStream) response.getEntity();
 		String theString = null;
 		try {
 			theString = IOUtils.toString(inputStream);
@@ -138,8 +186,10 @@ public class TestStudentService {
 		assertEquals(list.size(), array.length());
 		for (int index = 0; index < list.size(); index++) {
 			System.out.println(array.getJSONObject(index).get("pid"));
-			assertEquals(list.get(index).getPid().toString(), array.getJSONObject(index).get("pid"));
-			assertEquals(list.get(index).getName().toString(), array.getJSONObject(index).get("name"));
+			assertEquals(list.get(index).getPid().toString(), array
+					.getJSONObject(index).get("pid"));
+			assertEquals(list.get(index).getName().toString(), array
+					.getJSONObject(index).get("name"));
 		}
 	}
 }

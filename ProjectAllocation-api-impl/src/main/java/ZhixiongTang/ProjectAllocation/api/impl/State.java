@@ -17,6 +17,10 @@ public class State extends JSONObject {
 		this.initWithJSONObject(data.toJSONObject());
 	}
 	
+	public State() {
+		this.put("status", "success");
+	}
+	
 	public State(JSONObject data) {
 		this.put("status", "success");
 		this.initWithJSONObject(data);
