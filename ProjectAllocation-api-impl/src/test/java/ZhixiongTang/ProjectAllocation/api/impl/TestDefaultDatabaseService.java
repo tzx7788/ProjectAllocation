@@ -1,11 +1,8 @@
 package ZhixiongTang.ProjectAllocation.api.impl;
 
-import java.util.List;
 
 import org.ProjectAllocation.model.Professor;
-import org.ProjectAllocation.model.ProfessorPreferenceItem;
 import org.ProjectAllocation.model.Student;
-import org.ProjectAllocation.model.StudentPreferenceItem;
 import org.apache.catalina.Context;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.startup.Tomcat;
@@ -24,8 +21,6 @@ import org.junit.runners.JUnit4;
 import org.springframework.web.context.ContextLoaderListener;
 
 import ZhixiongTang.ProjectAllocation.api.DatabaseService;
-import ZhixiongTang.ProjectAllocation.api.HelloService;
-import ZhixiongTang.ProjectAllocation.api.StudentService;
 
 import junit.framework.TestCase;
 
