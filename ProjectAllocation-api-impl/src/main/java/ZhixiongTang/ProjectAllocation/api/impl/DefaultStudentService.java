@@ -2,6 +2,9 @@ package ZhixiongTang.ProjectAllocation.api.impl;
 
 import java.util.List;
 
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+
 import org.ProjectAllocation.model.Professor;
 import org.ProjectAllocation.model.Student;
 import org.hibernate.Query;
@@ -16,7 +19,7 @@ import org.springframework.stereotype.Service;
 public class DefaultStudentService implements
 		ZhixiongTang.ProjectAllocation.api.StudentService {
 
-	public String getInformationFromSID(String sid) {
+	public Response getInformationFromSID(String sid) {
 		SessionFactory sf = new Configuration().configure()
 				.buildSessionFactory();
 		Session session = sf.openSession();
@@ -31,11 +34,15 @@ public class DefaultStudentService implements
 		if (list.size() == 0) {
 			Error error = new Error("No student found!");
 			State state = new State(error);
-			return state.toString();
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
 		} else {
 			Student s = list.get(0);
 			State state = new State(s);
-			return state.toString();
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
 		}
 	}
 

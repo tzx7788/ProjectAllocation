@@ -2,13 +2,19 @@ package ZhixiongTang.ProjectAllocation.api.impl;
 
 import static org.junit.Assert.*;
 
+import java.io.*;
 import java.util.List;
+
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.Response;
+import org.apache.commons.*;
 
 import org.ProjectAllocation.model.Professor;
 import org.ProjectAllocation.model.Student;
 import org.apache.catalina.Context;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.hibernate.Query;
@@ -23,7 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.springframework.web.context.ContextLoaderListener;
+import org.springframework.web.context.ContextLoaderListener;  
 
 import ZhixiongTang.ProjectAllocation.api.StudentService;
 
@@ -89,12 +95,18 @@ public class TestStudentService {
 		Student s = list.get(0);
 		tx.commit();
 		session.close();
-		JSONObject jsonObject = new JSONObject(service
-				.getInformationFromSID("s1"));
-		System.out.print(service
-				.getInformationFromSID("s1"));
-		System.out.print(service
-				.getPreferenceListFromSID("s1"));
+		Response response = service.getInformationFromSID("s1");
+		System.out.println(response.getMetadata());
+		Integer length = Integer.parseInt(response.getMetadata().getFirst("Content-Length").toString());
+		System.out.println(length);
+		InputStream	 inputStream = (InputStream)response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = new JSONObject(theString);
 		jsonObject = jsonObject.getJSONObject("data");
 		assertEquals(s.getSid().toString(), jsonObject.get("sid"));
 		assertEquals(s.getName().toString(), jsonObject.get("name"));
