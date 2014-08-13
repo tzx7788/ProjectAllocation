@@ -5,9 +5,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.util.List;
 
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
-import org.apache.commons.*;
 
 import org.ProjectAllocation.model.Professor;
 import org.ProjectAllocation.model.Student;
@@ -97,8 +95,6 @@ public class TestStudentService {
 		session.close();
 		Response response = service.getInformationFromSID("s1");
 		System.out.println(response.getMetadata());
-		Integer length = Integer.parseInt(response.getMetadata().getFirst("Content-Length").toString());
-		System.out.println(length);
 		InputStream	 inputStream = (InputStream)response.getEntity();
 		String theString = null;
 		try {
@@ -128,8 +124,16 @@ public class TestStudentService {
 		List<Professor> list = s.preferProfessorsList();
 		tx.commit();
 		session.close();
-		JSONObject jsonObject = new JSONObject(service
-				.getPreferenceListFromSID("s1"));
+		Response response = service.getPreferenceListFromSID("s1");
+		System.out.println(response.getMetadata());
+		InputStream	 inputStream = (InputStream)response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = new JSONObject(theString);
 		JSONArray array = jsonObject.getJSONArray("data");
 		assertEquals(list.size(), array.length());
 		for (int index = 0; index < list.size(); index++) {

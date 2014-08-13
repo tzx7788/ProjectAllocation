@@ -46,7 +46,7 @@ public class DefaultStudentService implements
 		}
 	}
 
-	public String getPreferenceListFromSID(String sid) {
+	public Response getPreferenceListFromSID(String sid) {
 		SessionFactory sf = new Configuration().configure()
 				.buildSessionFactory();
 		Session session = sf.openSession();
@@ -59,7 +59,9 @@ public class DefaultStudentService implements
 			session.close();
 			Error error = new Error("No student found!");
 			State state = new State(error);
-			return state.toString();
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
 		} else {
 			Student s = (Student) query.list().get(0);
 			List<Professor> list = s.preferProfessorsList();
@@ -70,7 +72,9 @@ public class DefaultStudentService implements
 				result.put(professor.toJSONObject());
 			}
 			State state = new State(result);
-			return state.toString();
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
 		}
 	}
 }
