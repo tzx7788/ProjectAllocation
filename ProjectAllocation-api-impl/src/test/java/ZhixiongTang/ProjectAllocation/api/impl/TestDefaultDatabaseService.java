@@ -1,11 +1,16 @@
 package ZhixiongTang.ProjectAllocation.api.impl;
 
 
+import java.io.IOException;
+import java.io.InputStream;
+import javax.ws.rs.core.Response;
+
 import org.ProjectAllocation.model.Professor;
 import org.ProjectAllocation.model.Student;
 import org.apache.catalina.Context;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.hibernate.Query;
@@ -13,6 +18,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,6 +60,7 @@ public class TestDefaultDatabaseService extends TestCase {
 		port = tomcat.getConnector().getLocalPort();
 
 		System.out.println("Tomcat started on port:" + port);
+		
 	}
 
 	@After
@@ -74,7 +81,18 @@ public class TestDefaultDatabaseService extends TestCase {
 		DatabaseService service = JAXRSClientFactory.create("http://localhost:"
 				+ port + "/" + getRestServicesPath() + "/services/",
 				DatabaseService.class);
-		service.clearDatabase();
+		Response response = service.clearDatabase("developer");
+		System.out.println(response.getMetadata());
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		JSONObject jsonObject = new JSONObject(theString);
+		assertEquals(jsonObject.get("status"),"success");
 		SessionFactory sf = new Configuration().configure()
 				.buildSessionFactory();
 		Session session = sf.openSession();

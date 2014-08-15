@@ -1,6 +1,7 @@
  package ZhixiongTang.ProjectAllocation.api;
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -11,5 +12,5 @@ public interface DatabaseService {
     @Path( "clear" )
     @DELETE
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response clearDatabase();
+    Response clearDatabase( @HeaderParam("authentification") String authentification );
 }

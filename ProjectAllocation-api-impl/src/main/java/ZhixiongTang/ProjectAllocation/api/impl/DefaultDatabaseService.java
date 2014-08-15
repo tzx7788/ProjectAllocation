@@ -15,7 +15,15 @@ import ZhixiongTang.ProjectAllocation.api.DatabaseService;
 @Service("databaseService#default")
 public class DefaultDatabaseService implements DatabaseService {
 
-	public Response clearDatabase() {
+	public Response clearDatabase(String authentification) {
+		if ( authentification == null ) authentification = "";
+		if ( !authentification.equals("developer") ) {
+			Error error = new Error("Authentification Error");
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
 		SessionFactory sf = new Configuration().configure()
 				.buildSessionFactory();
 		Session session = sf.openSession();
