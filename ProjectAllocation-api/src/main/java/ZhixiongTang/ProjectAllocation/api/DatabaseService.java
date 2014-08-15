@@ -13,4 +13,5 @@ public interface DatabaseService {
     @DELETE
     @Produces( { MediaType.APPLICATION_JSON } )
     Response clearDatabase( @HeaderParam("authentification") String authentification );
+    
 }
