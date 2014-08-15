@@ -20,11 +20,14 @@ public class Student extends AbstractEntity {
 	public static final String TABLENAME = "Student";
 	public static final String COL_SID = "SID";
 	public static final String COL_NAME = "NAME";
+	public static final String COL_SESSION = "SESSION";
+
 	public static final String COL_PASSWORD = "PASSWORD";
 
 	private String sid;
 	private String name;
 	private String password;
+	private String session;
 	private List<StudentPreferenceItem> preferList;
 	private Set<ProfessorPreferenceItem> likedBy;
 
@@ -65,6 +68,15 @@ public class Student extends AbstractEntity {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	@Column(name = COL_SESSION, nullable = true)
+	public String getSession() {
+		return session;
+	}
+
+	public void setSession(String session) {
+		this.session = session;
 	}
 
 	@OneToMany(mappedBy="student",cascade=CascadeType.ALL)

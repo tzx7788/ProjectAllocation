@@ -22,10 +22,13 @@ public class Professor extends AbstractEntity {
 	public static final String COL_PID = "PID";
 	public static final String COL_NAME = "NAME";
 	public static final String COL_PASSWORD = "PASSWORD";
+	public static final String COL_SESSION = "SESSION";
 
 	private String pid;
 	private String name;
 	private String password;
+	private String session;
+
 	private List<ProfessorPreferenceItem> preferList;
 	private Set<StudentPreferenceItem> likedBy;
 
@@ -66,6 +69,15 @@ public class Professor extends AbstractEntity {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	@Column(name = COL_SESSION, nullable = true)
+	public String getSession() {
+		return session;
+	}
+
+	public void setSession(String session) {
+		this.session = session;
 	}
 
 	public void setPreferList(List<ProfessorPreferenceItem> preferList) {
