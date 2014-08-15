@@ -104,6 +104,7 @@ public class DefaultDatabaseService implements DatabaseService {
 			Professor p1 = new Professor("p1", "haha1");
 			Professor p2 = new Professor("p2", "haha1");
 			Professor p3 = new Professor("p3", "haha1");
+			s1.setSession("3e051af3f56067d8526cc1237134fcc8");
 			session.save(s1);
 			session.save(s2);
 			session.save(s3);

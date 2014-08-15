@@ -74,6 +74,7 @@ public class TestStudentService {
 		Student s1 = new Student("s1", "tzx1");
 		Student s2 = new Student("s2", "tzx2");
 		Student s3 = new Student("s3", "tzx3");
+		s1.setSession("3e051af3f56067d8526cc1237134fcc8");
 		Professor p1 = new Professor("p1", "haha1");
 		Professor p2 = new Professor("p2", "haha1");
 		Professor p3 = new Professor("p3", "haha1");
@@ -192,9 +193,9 @@ public class TestStudentService {
 					.getJSONObject(index).get("name"));
 		}
 	}
-	
+
 	@Test
-	public void testLogin()  {
+	public void testLogin() {
 		StudentService service = JAXRSClientFactory.create("http://localhost:"
 				+ port + "/" + getRestServicesPath() + "/services/",
 				StudentService.class);
@@ -207,7 +208,25 @@ public class TestStudentService {
 			e.printStackTrace();
 		}
 		JSONObject jsonObject = new JSONObject(theString);
-		assertEquals("success",jsonObject.getString("status"));
+		assertEquals("success", jsonObject.getString("status"));
+		jsonObject = jsonObject.getJSONObject("data");
+	}
+
+	@Test
+	public void testUpdate() {
+		StudentService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				StudentService.class);
+		Response response = service.updateStudents("s1","ff",null, "3e051af3f56067d8526cc1237134fcc8");
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = new JSONObject(theString);
+		assertEquals("success", jsonObject.getString("status"));
 		jsonObject = jsonObject.getJSONObject("data");
 	}
 }

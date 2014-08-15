@@ -15,6 +15,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.springframework.stereotype.Service;
 
 @Service("studentService#default")
@@ -92,9 +93,38 @@ public class DefaultStudentService implements
 		}
 	}
 
-	private Student login(String sid, String password) throws StudentException,
-			DatabaseException {
-		if ( sid == null ) throw new StudentException("No student ID input");
+	public Response updateStudents(String sid, String name, String password,
+			String studentSession) {
+		try {
+			Student s = this.update(sid, name, password, studentSession);
+			State state = new State(s);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (StudentException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (JSONException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
+	}
+
+	private Student update(String sid, String name, String password,
+			String studentSession) throws StudentException, DatabaseException,
+			JSONException {
 		SessionFactory sf = new Configuration().configure()
 				.buildSessionFactory();
 		Session session = sf.openSession();
@@ -108,7 +138,48 @@ public class DefaultStudentService implements
 			if (list.size() == 0)
 				throw new StudentException("No student found!");
 			Student s = list.get(0);
-			System.out.print(password+":"+s.getPassword());
+			this.authorization(s, studentSession);
+			if (name != null) {
+				s.setName(name);
+			}
+			if (password != null)
+				s.setPassword(password);
+			session.save(s);
+			tx.commit();
+			session.close();
+			return s;
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		}
+	}
+
+	private void authorization(Student s, String session)
+			throws StudentException {
+		if (s.getSession() == null)
+			throw new StudentException("Invalid session");
+		if (s.getSession().length() < 3)
+			throw new StudentException("Invalid session");
+		if (!s.getSession().equals(session))
+			throw new StudentException("Invalid session");
+	}
+
+	private Student login(String sid, String password) throws StudentException,
+			DatabaseException {
+		if (sid == null)
+			throw new StudentException("No student ID input");
+		SessionFactory sf = new Configuration().configure()
+				.buildSessionFactory();
+		Session session = sf.openSession();
+		try {
+			Transaction tx = session.beginTransaction();
+			String hql = "from Student where SID=:sid";
+			Query query = session.createQuery(hql);
+			query.setString("sid", sid);
+			@SuppressWarnings("unchecked")
+			List<Student> list = query.list();
+			if (list.size() == 0)
+				throw new StudentException("No student found!");
+			Student s = list.get(0);
 			if (!s.getPassword().equals(password))
 				throw new StudentException("Wrong password!");
 			s.setSession(SessionGenerator.generateSession());

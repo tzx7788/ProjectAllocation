@@ -26,4 +26,12 @@ public interface StudentService {
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response loginStudent(@HeaderParam("sid") String sid,
 			@HeaderParam("password") String password);
+
+	@Path("update/{sid}")
+	@POST
+	@Produces({ MediaType.APPLICATION_JSON })
+	Response updateStudents(@PathParam("sid") String sid,
+			@HeaderParam("data_name") String name,
+			@HeaderParam("data_password") String password,
+			@HeaderParam("session") String session);
 }
