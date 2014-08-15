@@ -192,4 +192,22 @@ public class TestStudentService {
 					.getJSONObject(index).get("name"));
 		}
 	}
+	
+	@Test
+	public void testLogin()  {
+		StudentService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				StudentService.class);
+		Response response = service.loginStudent("s1", "");
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = new JSONObject(theString);
+		assertEquals("success",jsonObject.getString("status"));
+		jsonObject = jsonObject.getJSONObject("data");
+	}
 }

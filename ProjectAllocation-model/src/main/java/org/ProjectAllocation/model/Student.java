@@ -57,8 +57,9 @@ public class Student extends AbstractEntity {
 		return sid;
 	}
 
-	@Column(name = COL_PASSWORD, length = 50)
+	@Column(name = COL_PASSWORD, length = 50, nullable = false)
 	public String getPassword() {
+		if ( password == null ) password = "";
 		return password;
 	}
 

@@ -62,8 +62,9 @@ public class Professor extends AbstractEntity {
 		return pid;
 	}
 
-	@Column(name = COL_PASSWORD)
+	@Column(name = COL_PASSWORD, nullable = false)
 	public String getPassword() {
+		if ( password == null ) password = "";
 		return password;
 	}
 
