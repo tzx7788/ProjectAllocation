@@ -257,6 +257,6 @@ public class TestStudentService {
 			e.printStackTrace();
 		}
 		jsonObject = new JSONObject(theString);
-		assertEquals("success", jsonObject.getString("fail"));
+		assertEquals("fail", jsonObject.getString("status"));
 	}
 }
