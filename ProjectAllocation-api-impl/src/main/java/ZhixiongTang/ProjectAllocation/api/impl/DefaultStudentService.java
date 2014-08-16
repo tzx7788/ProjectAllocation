@@ -93,6 +93,28 @@ public class DefaultStudentService implements
 		}
 	}
 
+	public Response logoutStudent(String sid, String studentSession) {
+		try {
+			logout(sid, studentSession);
+			State state = new State();
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (StudentException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
+	}
+
 	public Response updateStudents(String sid, String name, String password,
 			String studentSession) {
 		try {
@@ -125,11 +147,14 @@ public class DefaultStudentService implements
 	private Student update(String sid, String name, String password,
 			String studentSession) throws StudentException, DatabaseException,
 			JSONException {
-		SessionFactory sf = new Configuration().configure()
-				.buildSessionFactory();
-		Session session = sf.openSession();
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
 		try {
-			Transaction tx = session.beginTransaction();
+			sf = new Configuration().configure()
+					.buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
 			String hql = "from Student where SID=:sid";
 			Query query = session.createQuery(hql);
 			query.setString("sid", sid);
@@ -145,11 +170,13 @@ public class DefaultStudentService implements
 			if (password != null)
 				s.setPassword(password);
 			session.save(s);
-			tx.commit();
-			session.close();
+
 			return s;
 		} catch (HibernateException e) {
 			throw new DatabaseException(e.getMessage());
+		} finally {
+			if ( tx != null ) tx.commit();
+			if ( session != null ) session.close();
 		}
 	}
 
@@ -167,11 +194,14 @@ public class DefaultStudentService implements
 			DatabaseException {
 		if (sid == null)
 			throw new StudentException("No student ID input");
-		SessionFactory sf = new Configuration().configure()
-				.buildSessionFactory();
-		Session session = sf.openSession();
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
 		try {
-			Transaction tx = session.beginTransaction();
+			sf = new Configuration().configure()
+					.buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
 			String hql = "from Student where SID=:sid";
 			Query query = session.createQuery(hql);
 			query.setString("sid", sid);
@@ -184,43 +214,83 @@ public class DefaultStudentService implements
 				throw new StudentException("Wrong password!");
 			s.setSession(SessionGenerator.generateSession());
 			session.save(s);
-			tx.commit();
-			session.close();
 			return s;
 		} catch (HibernateException e) {
 			throw new DatabaseException(e.getMessage());
+		} finally {
+			if ( tx != null ) tx.commit();
+			if ( session != null ) session.close();
 		}
 	}
 
-	private Student findStudent(String sid) throws StudentException,
-			DatabaseException {
-		SessionFactory sf = new Configuration().configure()
-				.buildSessionFactory();
-		Session session = sf.openSession();
+	private void logout(String sid, String studentSession)
+			throws StudentException, DatabaseException {
+		if (sid == null)
+			throw new StudentException("No student ID input");
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
 		try {
-			Transaction tx = session.beginTransaction();
+			sf = new Configuration().configure()
+					.buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
 			String hql = "from Student where SID=:sid";
 			Query query = session.createQuery(hql);
 			query.setString("sid", sid);
 			@SuppressWarnings("unchecked")
 			List<Student> list = query.list();
-			tx.commit();
-			session.close();
+			if (list.size() == 0)
+				throw new StudentException("No student found!");
+			Student s = list.get(0);
+			if (!s.getSession().equals(studentSession))
+				throw new StudentException("invalid session!");
+			s.setSession("");
+			session.save(s);
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if ( tx != null ) tx.commit();
+			if ( session != null ) session.close();
+		}
+	}
+
+	private Student findStudent(String sid) throws StudentException,
+			DatabaseException {
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure()
+					.buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Student where SID=:sid";
+			Query query = session.createQuery(hql);
+			query.setString("sid", sid);
+			@SuppressWarnings("unchecked")
+			List<Student> list = query.list();
 			if (list.size() == 0)
 				throw new StudentException("No student found!");
 			return list.get(0);
 		} catch (HibernateException e) {
 			throw new DatabaseException(e.getMessage());
+		} finally {
+			if ( tx != null ) tx.commit();
+			if ( session != null ) session.close();
 		}
 	}
 
 	private List<Professor> findPreferProfessorsList(String sid)
 			throws StudentException, DatabaseException {
-		SessionFactory sf = new Configuration().configure()
-				.buildSessionFactory();
-		Session session = sf.openSession();
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
 		try {
-			Transaction tx = session.beginTransaction();
+			sf = new Configuration().configure()
+					.buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
 			String hql = "from Student where SID=:sid";
 			Query query = session.createQuery(hql);
 			query.setString("sid", sid);
@@ -229,11 +299,12 @@ public class DefaultStudentService implements
 			if (list.size() == 0)
 				throw new StudentException("No student found!");
 			List<Professor> result = list.get(0).preferProfessorsList();
-			tx.commit();
-			session.close();
 			return result;
 		} catch (HibernateException e) {
 			throw new DatabaseException(e.getMessage());
+		} finally {
+			if ( tx != null ) tx.commit();
+			if ( session != null ) session.close();
 		}
 	}
 }
