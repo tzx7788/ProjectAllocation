@@ -217,7 +217,8 @@ public class TestStudentService {
 		StudentService service = JAXRSClientFactory.create("http://localhost:"
 				+ port + "/" + getRestServicesPath() + "/services/",
 				StudentService.class);
-		Response response = service.updateStudents("s1","ff",null, "3e051af3f56067d8526cc1237134fcc8");
+		Response response = service.updateStudents("s1", "ff", null,
+				"3e051af3f56067d8526cc1237134fcc8");
 		InputStream inputStream = (InputStream) response.getEntity();
 		String theString = null;
 		try {
@@ -228,5 +229,34 @@ public class TestStudentService {
 		JSONObject jsonObject = new JSONObject(theString);
 		assertEquals("success", jsonObject.getString("status"));
 		jsonObject = jsonObject.getJSONObject("data");
+	}
+
+	@Test
+	public void testLogout() {
+		StudentService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				StudentService.class);
+		Response response = service.logoutStudent("s1",
+				"3e051af3f56067d8526cc1237134fcc8");
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = new JSONObject(theString);
+		assertEquals("success", jsonObject.getString("status"));
+		response = service.logoutStudent("s1",
+				"3e051af3f56067d8526cc1237134fcc8");
+		inputStream = (InputStream) response.getEntity();
+		theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		jsonObject = new JSONObject(theString);
+		assertEquals("success", jsonObject.getString("fail"));
 	}
 }
