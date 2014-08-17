@@ -1,4 +1,4 @@
-package ZhixiongTang.ProjectAllocation.api.impl;
+package ZhixiongTang.ProjectAllocation.api;
 
 public class StudentException extends Exception {
 

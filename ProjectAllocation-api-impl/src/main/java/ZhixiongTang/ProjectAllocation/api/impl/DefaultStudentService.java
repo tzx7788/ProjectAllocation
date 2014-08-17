@@ -2,6 +2,8 @@ package ZhixiongTang.ProjectAllocation.api.impl;
 
 import java.util.List;
 
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
@@ -17,6 +19,10 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.json.JSONArray;
 import org.springframework.stereotype.Service;
+
+import ZhixiongTang.ProjectAllocation.api.AuthException;
+import ZhixiongTang.ProjectAllocation.api.DatabaseException;
+import ZhixiongTang.ProjectAllocation.api.StudentException;
 
 @Service("studentService#default")
 public class DefaultStudentService implements
@@ -115,10 +121,10 @@ public class DefaultStudentService implements
 		}
 	}
 
-	public Response updateStudents(String sid, String name, String password,
+	public Response updateStudents(String sid, HttpHeaders headers,
 			String studentSession) {
 		try {
-			Student s = this.update(sid, name, password, studentSession);
+			Student s = this.update(sid, headers.getRequestHeaders(), studentSession);
 			State state = new State(s);
 			ResponseBuilder builder = Response.ok(state);
 			builder.entity(state.toString());
@@ -130,6 +136,12 @@ public class DefaultStudentService implements
 			builder.entity(state.toString());
 			return builder.build();
 		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (AuthException e) {
 			Error error = new Error(e.getMessage());
 			State state = new State(error);
 			ResponseBuilder builder = Response.ok(state);
@@ -158,11 +170,17 @@ public class DefaultStudentService implements
 			ResponseBuilder builder = Response.ok(state);
 			builder.entity(state.toString());
 			return builder.build();
+		} catch (AuthException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
 		}
 	}
 
-	private void delete(String sid, String pid, String studentSession)
-			throws StudentException, DatabaseException {
+	public void delete(String sid, String pid, String studentSession)
+			throws StudentException, DatabaseException, AuthException {
 		SessionFactory sf = null;
 		Session session = null;
 		Transaction tx = null;
@@ -199,8 +217,8 @@ public class DefaultStudentService implements
 		}
 	}
 
-	private Student update(String sid, String name, String password,
-			String studentSession) throws StudentException, DatabaseException {
+	public Student update(String sid, MultivaluedMap<String,String> data,
+			String studentSession) throws StudentException, DatabaseException, AuthException {
 		SessionFactory sf = null;
 		Session session = null;
 		Transaction tx = null;
@@ -217,11 +235,12 @@ public class DefaultStudentService implements
 				throw new StudentException("No student found!");
 			Student s = list.get(0);
 			this.authorization(s, studentSession);
-			if (name != null) {
-				s.setName(name);
+			if ( data.containsKey("data_name")) {
+				s.setName(data.get("data_name").get(0));
 			}
-			if (password != null)
-				s.setPassword(password);
+			if ( data.containsKey("data_password")) {
+				s.setPassword(data.get("data_password").get(0));
+			}
 			session.save(s);
 
 			return s;
@@ -235,17 +254,17 @@ public class DefaultStudentService implements
 		}
 	}
 
-	private void authorization(Student s, String session)
-			throws StudentException {
+	public void authorization(Student s, String session)
+			throws AuthException {
 		if (s.getSession() == null)
-			throw new StudentException("Invalid session");
+			throw new AuthException("Invalid session");
 		if (s.getSession().length() < 3)
-			throw new StudentException("Invalid session");
+			throw new AuthException("Invalid session");
 		if (!s.getSession().equals(session))
-			throw new StudentException("Invalid session");
+			throw new AuthException("Invalid session");
 	}
 
-	private Student login(String sid, String password) throws StudentException,
+	public Student login(String sid, String password) throws StudentException,
 			DatabaseException {
 		if (sid == null)
 			throw new StudentException("No student ID input");
@@ -279,7 +298,7 @@ public class DefaultStudentService implements
 		}
 	}
 
-	private void logout(String sid, String studentSession)
+	public void logout(String sid, String studentSession)
 			throws StudentException, DatabaseException {
 		if (sid == null)
 			throw new StudentException("No student ID input");
@@ -312,7 +331,7 @@ public class DefaultStudentService implements
 		}
 	}
 
-	private Student findStudent(String sid) throws StudentException,
+	public Student findStudent(String sid) throws StudentException,
 			DatabaseException {
 		SessionFactory sf = null;
 		Session session = null;
@@ -339,7 +358,7 @@ public class DefaultStudentService implements
 		}
 	}
 
-	private List<Professor> findPreferProfessorsList(String sid)
+	public List<Professor> findPreferProfessorsList(String sid)
 			throws StudentException, DatabaseException {
 		SessionFactory sf = null;
 		Session session = null;
@@ -366,4 +385,17 @@ public class DefaultStudentService implements
 				session.close();
 		}
 	}
+
+	public Response addPreferProfessor(String sid, String pid,
+			String studentSession) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Response swapPreferProfessor(String sid, String pid1, String pid2,
+			String studentSession) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
