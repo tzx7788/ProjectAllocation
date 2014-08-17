@@ -177,7 +177,39 @@ public class DefaultProfessorService implements ProfessorService {
 	public Professor update(String pid, MultivaluedMap<String, String> data,
 			String professorSession) throws ProfessorException,
 			DatabaseException, AuthException {
-		return null;
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Professor where PID=:pid";
+			Query query = session.createQuery(hql);
+			query.setString("pid", pid);
+			@SuppressWarnings("unchecked")
+			List<Professor> list = query.list();
+			if (list.size() == 0)
+				throw new ProfessorException("No student found!");
+			Professor p = list.get(0);
+			this.authorization(p, professorSession);
+			if ( data.containsKey("data_name")) {
+				p.setName(data.get("data_name").get(0));
+			}
+			if ( data.containsKey("data_password")) {
+				p.setPassword(data.get("data_password").get(0));
+			}
+			session.save(p);
+
+			return p;
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 	public void authorization(Professor p, String session) throws AuthException {
@@ -187,7 +219,6 @@ public class DefaultProfessorService implements ProfessorService {
 			throw new AuthException("Invalid session");
 		if (!p.getSession().equals(session))
 			throw new AuthException("Invalid session");
-
 	}
 
 	public Professor login(String pid, String password)
