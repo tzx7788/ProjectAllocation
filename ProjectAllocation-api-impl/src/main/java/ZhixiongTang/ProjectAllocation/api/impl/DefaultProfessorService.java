@@ -106,8 +106,25 @@ public class DefaultProfessorService implements ProfessorService {
 	}
 
 	public Response logoutProfessor(String pid, String professorSession) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			this.logout(pid, professorSession);
+			State state = new State();
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (ProfessorException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
 	}
 
 	public Response deletePreferStudent(String pid, String sid,
@@ -143,7 +160,7 @@ public class DefaultProfessorService implements ProfessorService {
 
 	public void authorization(Professor p, String session) throws AuthException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public Professor login(String pid, String password)
@@ -180,10 +197,38 @@ public class DefaultProfessorService implements ProfessorService {
 		}
 	}
 
-	public void logout(String pid, String studentSession)
+	public void logout(String pid, String professorSession)
 			throws ProfessorException, DatabaseException {
-		// TODO Auto-generated method stub
-		
+		if (pid == null)
+			throw new ProfessorException("No professor ID input");
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Professor where PID=:pid";
+			Query query = session.createQuery(hql);
+			query.setString("pid", pid);
+			@SuppressWarnings("unchecked")
+			List<Professor> list = query.list();
+			if (list.size() == 0)
+				throw new ProfessorException("No professor found!");
+			Professor p = list.get(0);
+			if (!p.getSession().equals(professorSession))
+				throw new ProfessorException("invalid session!");
+			p.setSession("");
+			session.save(p);
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
+
 	}
 
 	public Professor findProfessor(String pid) throws ProfessorException,

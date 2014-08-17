@@ -84,7 +84,7 @@ public interface ProfessorService {
 	Professor login(String pid, String password) throws ProfessorException,
 			DatabaseException;
 
-	void logout(String pid, String studentSession) throws ProfessorException,
+	void logout(String pid, String professorSession) throws ProfessorException,
 			DatabaseException;
 
 	Professor findProfessor(String pid) throws ProfessorException, DatabaseException;

@@ -80,6 +80,7 @@ public class TestProfessorService {
 		Professor p1 = new Professor("p1", "haha1");
 		Professor p2 = new Professor("p2", "haha1");
 		Professor p3 = new Professor("p3", "haha1");
+		p1.setSession("3e051af3f56067d8526cc1237134fcc8");
 		session.save(s1);
 		session.save(s2);
 		session.save(s3);
@@ -216,7 +217,19 @@ public class TestProfessorService {
 
 	@Test
 	public void testLogout() {
-
+		ProfessorService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				ProfessorService.class);
+		Response response = service.logoutProfessor("p1", "3e051af3f56067d8526cc1237134fcc8");
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = new JSONObject(theString);
+		assertEquals("success", jsonObject.getString("status"));
 	}
 
 	@Test
