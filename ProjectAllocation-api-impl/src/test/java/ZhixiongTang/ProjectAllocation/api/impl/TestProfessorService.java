@@ -1,10 +1,12 @@
 package ZhixiongTang.ProjectAllocation.api.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
@@ -33,6 +35,7 @@ import org.junit.runners.JUnit4;
 import org.springframework.web.context.ContextLoaderListener;
 
 import ZhixiongTang.ProjectAllocation.api.ProfessorService;
+import ZhixiongTang.ProjectAllocation.api.StudentService;
 
 @RunWith(JUnit4.class)
 public class TestProfessorService {
@@ -72,6 +75,7 @@ public class TestProfessorService {
 		session.createSQLQuery("DELETE FROM Professor").executeUpdate();
 		session.createSQLQuery("DELETE FROM SPreference").executeUpdate();
 		session.createSQLQuery("DELETE FROM PPreference").executeUpdate();
+		session.createSQLQuery("DELETE FROM Result").executeUpdate();
 		Student s1 = new Student("s1", "tzx1");
 		Student s2 = new Student("s2", "tzx2");
 		Student s3 = new Student("s3", "tzx3");
@@ -80,6 +84,9 @@ public class TestProfessorService {
 		Professor p2 = new Professor("p2", "haha1");
 		Professor p3 = new Professor("p3", "haha1");
 		p1.setSession("3e051af3f56067d8526cc1237134fcc8");
+		s1.getResult().add(p1);
+		s1.getResult().add(p2);
+		p1.getResult().add(s1);
 		session.save(s1);
 		session.save(s2);
 		session.save(s3);
@@ -319,4 +326,41 @@ public class TestProfessorService {
 		assertEquals("fail", jsonObject.getString("status"));
 	}
 
+	@Test
+	public void testGetResult() {
+		ProfessorService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				ProfessorService.class);
+		SessionFactory sf = new Configuration().configure()
+				.buildSessionFactory();
+		Session session = sf.openSession();
+		Transaction tx = session.beginTransaction();
+		String hql = "from Professor where PID=:pid";
+		Query query = session.createQuery(hql);
+		query.setString("pid", "p1");
+		Professor p = (Professor) query.list().get(0);
+		Set<Student> set = p.getResult();
+		Response response = service.getResultFromPID("p1");
+		System.out.println(response.getMetadata());
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = new JSONObject(theString);
+		JSONArray array = jsonObject.getJSONArray("data");
+		System.out.println("haha"+theString);
+		assertEquals(set.size(), array.length());
+		for (int index = 0; index < array.length() ; index++) {
+			hql = "from Student where SID=:sid";
+			query = session.createQuery(hql);
+			query.setString("sid", array.getJSONObject(index).get("sid").toString());
+			Student s = (Student) query.list().get(0);
+			assertTrue(set.contains(s));
+		}
+		tx.commit();
+		session.close();
+	}
 }

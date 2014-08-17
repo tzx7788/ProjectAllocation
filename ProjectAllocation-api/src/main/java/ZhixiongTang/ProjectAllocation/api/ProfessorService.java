@@ -1,7 +1,5 @@
 package ZhixiongTang.ProjectAllocation.api;
 
-import java.util.List;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -11,15 +9,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-
-import org.ProjectAllocation.model.Professor;
-import org.ProjectAllocation.model.Student;
-
-import ZhixiongTang.ProjectAllocation.api.exception.AuthException;
-import ZhixiongTang.ProjectAllocation.api.exception.DatabaseException;
-import ZhixiongTang.ProjectAllocation.api.exception.ProfessorException;
 
 @Path("ProfessorService")
 public interface ProfessorService {
@@ -71,31 +61,9 @@ public interface ProfessorService {
 	Response swapPreferStudent(@HeaderParam("pid") String pid,
 			@HeaderParam("sid1") String sid1, @HeaderParam("sid2") String sid2,
 			@HeaderParam("session") String professorSession);
-
-	List<Student> delete(String pid, String sid, String professorSession)
-			throws ProfessorException, DatabaseException, AuthException;
-
-	Professor update(String pid, MultivaluedMap<String, String> data,
-			String professorSession) throws ProfessorException, DatabaseException,
-			AuthException;
-
-	void authorization(Professor p, String session) throws AuthException;
-
-	Professor login(String pid, String password) throws ProfessorException,
-			DatabaseException;
-
-	void logout(String pid, String professorSession) throws ProfessorException,
-			DatabaseException;
-
-	Professor findProfessor(String pid) throws ProfessorException, DatabaseException;
-
-	List<Student> findPreferStudentsList(String pid)
-			throws ProfessorException, DatabaseException;
-
-	List<Student> add(String pid, String sid, String professorSession)
-			throws ProfessorException, DatabaseException, AuthException;
-
-	List<Student> swap(String pid, String sid1, String sid2,
-			String studentSession) throws ProfessorException, DatabaseException,
-			AuthException;
+	
+	@Path("result/{pid}")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	Response getResultFromPID(@PathParam("pid") String pid);
 }

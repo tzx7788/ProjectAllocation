@@ -1,6 +1,8 @@
 package ZhixiongTang.ProjectAllocation.api.impl;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
@@ -20,13 +22,14 @@ import org.hibernate.cfg.Configuration;
 import org.json.JSONArray;
 import org.springframework.stereotype.Service;
 
+import ZhixiongTang.ProjectAllocation.api.StudentService;
 import ZhixiongTang.ProjectAllocation.api.exception.AuthException;
 import ZhixiongTang.ProjectAllocation.api.exception.DatabaseException;
 import ZhixiongTang.ProjectAllocation.api.exception.StudentException;
 
 @Service("studentService#default")
 public class DefaultStudentService implements
-		ZhixiongTang.ProjectAllocation.api.StudentService {
+		StudentService {
 
 	public Response getInformationFromSID(String sid) {
 		try {
@@ -543,6 +546,62 @@ public class DefaultStudentService implements
 						+ ") has not been added!");
 			student.swap(professor1, professor2);
 			return student.preferProfessorsList();
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
+	}
+
+	public Response getResultFromSID(String sid) {
+		try {
+			Set<Professor> set = this.findResults(sid);
+			JSONArray result = new JSONArray();
+			for (Professor professor : set) {
+				result.put(professor.toJSONObject());
+			}
+			State state = new State(result);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (StudentException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
+	}
+
+	public Set<Professor> findResults(String sid)
+			throws StudentException, DatabaseException {
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Student where SID=:sid";
+			Query query = session.createQuery(hql);
+			query.setString("sid", sid);
+			@SuppressWarnings("unchecked")
+			List<Student> list = query.list();
+			if (list.size() == 0)
+				throw new StudentException("No student found!");
+			Set<Professor> result = new HashSet<Professor>();
+			for ( Professor p : list.get(0).getResult() )
+				result.add(p);
+			return result;
 		} catch (HibernateException e) {
 			throw new DatabaseException(e.getMessage());
 		} finally {

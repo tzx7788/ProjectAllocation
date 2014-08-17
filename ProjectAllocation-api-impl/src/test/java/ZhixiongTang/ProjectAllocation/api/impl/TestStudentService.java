@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
@@ -71,6 +72,7 @@ public class TestStudentService {
 		session.createSQLQuery("DELETE FROM Professor").executeUpdate();
 		session.createSQLQuery("DELETE FROM SPreference").executeUpdate();
 		session.createSQLQuery("DELETE FROM PPreference").executeUpdate();
+		session.createSQLQuery("DELETE FROM Result").executeUpdate();
 		Student s1 = new Student("s1", "tzx1");
 		Student s2 = new Student("s2", "tzx2");
 		Student s3 = new Student("s3", "tzx3");
@@ -78,6 +80,9 @@ public class TestStudentService {
 		Professor p1 = new Professor("p1", "haha1");
 		Professor p2 = new Professor("p2", "haha1");
 		Professor p3 = new Professor("p3", "haha1");
+		s1.getResult().add(p1);
+		s1.getResult().add(p2);
+		p1.getResult().add(s1);
 		session.save(s1);
 		session.save(s2);
 		session.save(s3);
@@ -316,7 +321,7 @@ public class TestStudentService {
 		JSONObject jsonObject = new JSONObject(theString);
 		assertEquals("success", jsonObject.getString("status"));
 		response = service.swapPreferProfessor("s1", "p1", "p3",
-		"3e051af3f56067d8526cc1237134fcc8");
+				"3e051af3f56067d8526cc1237134fcc8");
 		inputStream = (InputStream) response.getEntity();
 		theString = null;
 		try {
@@ -327,6 +332,43 @@ public class TestStudentService {
 		jsonObject = new JSONObject(theString);
 		assertEquals("fail", jsonObject.getString("status"));
 
+	}
+
+	@Test
+	public void testGetResult() {
+		StudentService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				StudentService.class);
+		SessionFactory sf = new Configuration().configure()
+				.buildSessionFactory();
+		Session session = sf.openSession();
+		Transaction tx = session.beginTransaction();
+		String hql = "from Student where SID=:sid";
+		Query query = session.createQuery(hql);
+		query.setString("sid", "s1");
+		Student s = (Student) query.list().get(0);
+		Set<Professor> set = s.getResult();
+		Response response = service.getResultFromSID("s1");
+		System.out.println(response.getMetadata());
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = new JSONObject(theString);
+		JSONArray array = jsonObject.getJSONArray("data");
+		assertEquals(set.size(), array.length());
+		for (int index = 0; index < array.length() ; index++) {
+			hql = "from Professor where PID=:pid";
+			query = session.createQuery(hql);
+			query.setString("pid", array.getJSONObject(index).get("pid").toString());
+			Professor p = (Professor) query.list().get(0);
+			assertTrue(set.contains(p));
+		}
+		tx.commit();
+		session.close();
 	}
 
 }

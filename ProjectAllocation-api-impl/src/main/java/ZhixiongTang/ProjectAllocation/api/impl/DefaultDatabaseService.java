@@ -88,6 +88,7 @@ public class DefaultDatabaseService implements DatabaseService {
 			session.createSQLQuery("DELETE FROM SPreference").executeUpdate();
 			session.createSQLQuery("DELETE FROM PPreference").executeUpdate();
 			session.createSQLQuery("DELETE FROM Admin").executeUpdate();
+			session.createSQLQuery("DELETE FROM Result").executeUpdate();
 			tx.commit();
 			session.close();
 		} catch (HibernateException e) {
@@ -112,6 +113,9 @@ public class DefaultDatabaseService implements DatabaseService {
 			p1.setSession("3e051af3f56067d8526cc1237134fcc8");
 			Admin a1 = new Admin("a1","admin");
 			a1.setSession("3e051af3f56067d8526cc1237134fcc8");
+			s1.getResult().add(p1);
+			s1.getResult().add(p2);
+			p1.getResult().add(s1);
 			session.save(s1);
 			session.save(s2);
 			session.save(s3);

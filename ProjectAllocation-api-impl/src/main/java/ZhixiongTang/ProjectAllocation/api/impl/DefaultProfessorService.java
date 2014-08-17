@@ -1,6 +1,8 @@
 package ZhixiongTang.ProjectAllocation.api.impl;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
@@ -546,6 +548,62 @@ public class DefaultProfessorService implements ProfessorService {
 						+ " has not been added");
 			professor.swap(student1, student2);
 			List<Student> result = professor.preferStudentsList();
+			return result;
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
+	}
+
+	public Response getResultFromPID(String pid) {
+		try {
+			Set<Student> set = this.findResults(pid);
+			JSONArray result = new JSONArray();
+			for (Student student : set) {
+				result.put(student.toJSONObject());
+			}
+			State state = new State(result);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (ProfessorException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
+	}
+
+	public Set<Student> findResults(String pid)
+			throws ProfessorException, DatabaseException {
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Professor where PID=:pid";
+			Query query = session.createQuery(hql);
+			query.setString("pid", pid);
+			@SuppressWarnings("unchecked")
+			List<Professor> list = query.list();
+			if (list.size() == 0)
+				throw new ProfessorException("No professor found!");
+			Set<Student> result = new HashSet<Student>();
+			for ( Student s : list.get(0).getResult() )
+				result.add(s);
 			return result;
 		} catch (HibernateException e) {
 			throw new DatabaseException(e.getMessage());
