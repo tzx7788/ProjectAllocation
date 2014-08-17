@@ -7,7 +7,6 @@ import java.util.Set;
 
 import javax.persistence.*;
 
-import org.hibernate.annotations.Type;
 import org.json.JSONObject;
 
 

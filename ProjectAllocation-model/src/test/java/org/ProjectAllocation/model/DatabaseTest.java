@@ -30,12 +30,15 @@ public class DatabaseTest extends TestCase {
 		session.createSQLQuery("DELETE FROM Professor").executeUpdate();
 		session.createSQLQuery("DELETE FROM SPreference").executeUpdate();
 		session.createSQLQuery("DELETE FROM PPreference").executeUpdate();
+		session.createSQLQuery("DELETE FROM Admin").executeUpdate();
 		Student s1 = new Student("s1", "tzx1");
 		Student s2 = new Student("s2", "tzx2");
 		Student s3 = new Student("s3", "tzx3");
 		Professor p1 = new Professor("p1", "haha1");
 		Professor p2 = new Professor("p2", "haha1");
 		Professor p3 = new Professor("p3", "haha1");
+		Admin a1 = new Admin("a1","admin");
+		session.save(a1);
 		session.save(s1);
 		session.save(s2);
 		session.save(s3);

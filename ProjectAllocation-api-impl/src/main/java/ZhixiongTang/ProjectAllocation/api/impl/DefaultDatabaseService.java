@@ -3,6 +3,7 @@ package ZhixiongTang.ProjectAllocation.api.impl;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
+import org.ProjectAllocation.model.Admin;
 import org.ProjectAllocation.model.Professor;
 import org.ProjectAllocation.model.ProfessorPreferenceItem;
 import org.ProjectAllocation.model.Student;
@@ -86,6 +87,7 @@ public class DefaultDatabaseService implements DatabaseService {
 			session.createSQLQuery("DELETE FROM Professor").executeUpdate();
 			session.createSQLQuery("DELETE FROM SPreference").executeUpdate();
 			session.createSQLQuery("DELETE FROM PPreference").executeUpdate();
+//			session.createSQLQuery("DELETE FROM Adminß").executeUpdate();
 			tx.commit();
 			session.close();
 		} catch (HibernateException e) {
@@ -108,6 +110,8 @@ public class DefaultDatabaseService implements DatabaseService {
 			Professor p3 = new Professor("p3", "haha3");
 			s1.setSession("3e051af3f56067d8526cc1237134fcc8");
 			p1.setSession("3e051af3f56067d8526cc1237134fcc8");
+			Admin a1 = new Admin("a1","admin");
+			a1.setSession("3e051af3f56067d8526cc1237134fcc8");
 			session.save(s1);
 			session.save(s2);
 			session.save(s3);
