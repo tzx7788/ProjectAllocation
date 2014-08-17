@@ -258,7 +258,7 @@ public class TestStudentService {
 		JSONObject jsonObject = new JSONObject(theString);
 		assertEquals("success", jsonObject.getString("status"));
 		response = service.deletePreferProfessor("s1", "p1",
-		"3e051af3f56067d8526cc1237134fcc8");
+				"3e051af3f56067d8526cc1237134fcc8");
 		inputStream = (InputStream) response.getEntity();
 		theString = null;
 		try {
@@ -269,4 +269,64 @@ public class TestStudentService {
 		jsonObject = new JSONObject(theString);
 		assertEquals("fail", jsonObject.getString("status"));
 	}
+
+	@Test
+	public void testAdd() {
+		StudentService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				StudentService.class);
+		Response response = service.addPreferProfessor("s1", "p3",
+				"3e051af3f56067d8526cc1237134fcc8");
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = new JSONObject(theString);
+		assertEquals("success", jsonObject.getString("status"));
+		response = service.addPreferProfessor("s1", "p1",
+				"3e051af3f56067d8526cc1237134fcc8");
+		inputStream = (InputStream) response.getEntity();
+		theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		jsonObject = new JSONObject(theString);
+		assertEquals("fail", jsonObject.getString("status"));
+	}
+
+	@Test
+	public void testSwap() {
+		StudentService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				StudentService.class);
+		Response response = service.swapPreferProfessor("s1", "p1", "p2",
+				"3e051af3f56067d8526cc1237134fcc8");
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = new JSONObject(theString);
+		assertEquals("success", jsonObject.getString("status"));
+		response = service.swapPreferProfessor("s1", "p1", "p3",
+		"3e051af3f56067d8526cc1237134fcc8");
+		inputStream = (InputStream) response.getEntity();
+		theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		jsonObject = new JSONObject(theString);
+		assertEquals("fail", jsonObject.getString("status"));
+
+	}
+
 }

@@ -39,8 +39,7 @@ public interface StudentService {
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response updateStudents(@PathParam("sid") String sid,
-			@Context HttpHeaders headers,
-			@HeaderParam("session") String session);
+			@Context HttpHeaders headers, @HeaderParam("session") String session);
 
 	@Path("logout")
 	@POST
@@ -69,11 +68,12 @@ public interface StudentService {
 			@HeaderParam("pid1") String pid1, @HeaderParam("pid2") String pid2,
 			@HeaderParam("session") String studentSession);
 
-	void delete(String sid, String pid, String studentSession)
-			throws StudentException, DatabaseException,AuthException;
+	List<Professor> delete(String sid, String pid, String studentSession)
+			throws StudentException, DatabaseException, AuthException;
 
-	Student update(String sid,MultivaluedMap<String,String> data,
-			String studentSession) throws StudentException, DatabaseException,AuthException;
+	Student update(String sid, MultivaluedMap<String, String> data,
+			String studentSession) throws StudentException, DatabaseException,
+			AuthException;
 
 	void authorization(Student s, String session) throws AuthException;
 
@@ -87,4 +87,11 @@ public interface StudentService {
 
 	List<Professor> findPreferProfessorsList(String sid)
 			throws StudentException, DatabaseException;
+
+	List<Professor> add(String sid, String pid, String studentSession)
+			throws StudentException, DatabaseException, AuthException;
+
+	List<Professor> swap(String sid, String pid1, String pid2,
+			String studentSession) throws StudentException, DatabaseException,
+			AuthException;
 }

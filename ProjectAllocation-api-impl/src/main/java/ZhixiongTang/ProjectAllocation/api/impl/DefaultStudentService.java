@@ -153,8 +153,12 @@ public class DefaultStudentService implements
 	public Response deletePreferProfessor(String sid, String pid,
 			String studentSession) {
 		try {
-			this.delete(sid, pid, studentSession);
-			State state = new State();
+			List<Professor> list = this.delete(sid, pid, studentSession);
+			JSONArray result = new JSONArray();
+			for (Professor professor : list) {
+				result.put(professor.toJSONObject());
+			}
+			State state = new State(result);
 			ResponseBuilder builder = Response.ok(state);
 			builder.entity(state.toString());
 			return builder.build();
@@ -179,7 +183,7 @@ public class DefaultStudentService implements
 		}
 	}
 
-	public void delete(String sid, String pid, String studentSession)
+	public List<Professor> delete(String sid, String pid, String studentSession)
 			throws StudentException, DatabaseException, AuthException {
 		SessionFactory sf = null;
 		Session session = null;
@@ -203,7 +207,8 @@ public class DefaultStudentService implements
 					preferList.remove(item);
 					session.delete(item);
 					item.getProfessor().getLikedBy().remove(item);
-					return;
+					List<Professor> result = list.get(0).preferProfessorsList();
+					return result;
 				}
 			}
 			throw new StudentException("No professor found!");
@@ -388,14 +393,156 @@ public class DefaultStudentService implements
 
 	public Response addPreferProfessor(String sid, String pid,
 			String studentSession) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			List<Professor> list = this.add(sid, pid, studentSession);
+			JSONArray result = new JSONArray();
+			for (Professor professor : list) {
+				result.put(professor.toJSONObject());
+			}
+			State state = new State(result);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (StudentException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (AuthException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
+	}
+	
+	public List<Professor> add(String sid, String pid,
+			String studentSession) throws StudentException, DatabaseException, AuthException{
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Student where SID=:sid";
+			Query query = session.createQuery(hql);
+			query.setString("sid", sid);
+			@SuppressWarnings("unchecked")
+			List<Student> list = query.list();
+			if (list.size() == 0)
+				throw new StudentException("No student found!");
+			Student student = list.get(0);
+			hql = "from Professor where PID=:pid";
+			query = session.createQuery(hql);
+			query.setString("pid", pid);
+			if (query.list().size() == 0)
+				throw new StudentException("No Professor found!");
+			Professor professor = (Professor) query.list().get(0);
+			if ( student.preferProfessorsList().contains(professor) )
+				throw new StudentException("Professor has already been added!");
+			int weight = 0;
+			if ( student.getPreferList().size() > 0 ) {
+				weight = student.getPreferList().get(student.getPreferList().size()-1).getKey();
+			}
+			StudentPreferenceItem item = new StudentPreferenceItem(student,professor,weight);
+			student.getPreferList().add(item);
+			session.save(student);
+			return student.preferProfessorsList();
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 	public Response swapPreferProfessor(String sid, String pid1, String pid2,
 			String studentSession) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			List<Professor> list = this.swap(sid, pid1, pid2, studentSession);
+			JSONArray result = new JSONArray();
+			for (Professor professor : list) {
+				result.put(professor.toJSONObject());
+			}
+			State state = new State(result);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (StudentException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (AuthException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
+	}
+	
+	public List<Professor> swap(String sid, String pid1, String pid2,
+			String studentSession) throws StudentException, DatabaseException, AuthException{
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Student where SID=:sid";
+			Query query = session.createQuery(hql);
+			query.setString("sid", sid);
+			@SuppressWarnings("unchecked")
+			List<Student> list = query.list();
+			if (list.size() == 0)
+				throw new StudentException("No student found!");
+			Student student = list.get(0);
+			hql = "from Professor where PID=:pid1";
+			query = session.createQuery(hql);
+			query.setString("pid1", pid1);
+			if (query.list().size() == 0)
+				throw new StudentException("No Professor found! pid:"+pid1);
+			Professor professor1 = (Professor) query.list().get(0);
+			if ( !student.preferProfessorsList().contains(professor1) )
+				throw new StudentException("Professor(pid:"+pid1+") has not been added!");
+			hql = "from Professor where PID=:pid2";
+			query = session.createQuery(hql);
+			query.setString("pid2", pid2);
+			if (query.list().size() == 0)
+				throw new StudentException("No Professor found! pid:"+pid1);
+			Professor professor2 = (Professor) query.list().get(0);
+			if ( !student.preferProfessorsList().contains(professor2) )
+				throw new StudentException("Professor(pid:"+pid2+") has not been added!");
+			student.swap(professor1, professor2);
+			return student.preferProfessorsList();
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 }
