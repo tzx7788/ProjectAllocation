@@ -103,7 +103,8 @@ public class DefaultProfessorService implements ProfessorService {
 	public Response updateProfessor(String pid, HttpHeaders headers,
 			String session) {
 		try {
-			Professor p = this.update(pid, headers.getRequestHeaders(), session);
+			Professor p = this
+					.update(pid, headers.getRequestHeaders(), session);
 			State state = new State(p);
 			ResponseBuilder builder = Response.ok(state);
 			builder.entity(state.toString());
@@ -186,8 +187,35 @@ public class DefaultProfessorService implements ProfessorService {
 
 	public Response addPreferStudent(String pid, String sid,
 			String professorSession) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			List<Student> list = this.add(pid, sid, professorSession);
+			JSONArray result = new JSONArray();
+			for (Student student : list) {
+				result.put(student.toJSONObject());
+			}
+			State state = new State(result);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (ProfessorException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (AuthException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
 	}
 
 	public Response swapPreferStudent(String pid, String sid1, String sid2,
@@ -213,7 +241,8 @@ public class DefaultProfessorService implements ProfessorService {
 			if (list.size() == 0)
 				throw new ProfessorException("No professor found!");
 			this.authorization(list.get(0), professorSession);
-			List<ProfessorPreferenceItem> preferList = list.get(0).getPreferList();
+			List<ProfessorPreferenceItem> preferList = list.get(0)
+					.getPreferList();
 			for (ProfessorPreferenceItem item : preferList) {
 				if (item.getStudent().getSid().equals(sid)) {
 					preferList.remove(item);
@@ -253,10 +282,10 @@ public class DefaultProfessorService implements ProfessorService {
 				throw new ProfessorException("No student found!");
 			Professor p = list.get(0);
 			this.authorization(p, professorSession);
-			if ( data.containsKey("data_name")) {
+			if (data.containsKey("data_name")) {
 				p.setName(data.get("data_name").get(0));
 			}
-			if ( data.containsKey("data_password")) {
+			if (data.containsKey("data_password")) {
 				p.setPassword(data.get("data_password").get(0));
 			}
 			session.save(p);
@@ -406,8 +435,47 @@ public class DefaultProfessorService implements ProfessorService {
 
 	public List<Student> add(String pid, String sid, String professorSession)
 			throws ProfessorException, DatabaseException, AuthException {
-		// TODO Auto-generated method stub
-		return null;
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Professor where PID=:pid";
+			Query query = session.createQuery(hql);
+			query.setString("pid", pid);
+			@SuppressWarnings("unchecked")
+			List<Professor> list = query.list();
+			if (list.size() == 0)
+				throw new ProfessorException("No professor found!");
+			this.authorization(list.get(0), professorSession);
+			Professor professor = list.get(0);
+			hql = "from Student where SID=:sid";
+			query = session.createQuery(hql);
+			query.setString("sid", sid);
+			if (query.list().size() == 0)
+				throw new ProfessorException("No student found!");
+			Student student = (Student) query.list().get(0);
+			if (professor.preferStudentsList().contains(student))
+				throw new ProfessorException("student has already been added");
+			int weight = 0;
+			if (professor.getPreferList().size() > 0)
+				weight = professor.getPreferList()
+						.get(professor.getPreferList().size() - 1).getWeight() + 1;
+			ProfessorPreferenceItem item = new ProfessorPreferenceItem(
+					professor, student, weight);
+			professor.getPreferList().add(item);
+			session.save(professor);
+			return professor.preferStudentsList();
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 	public List<Student> swap(String pid, String sid1, String sid2,

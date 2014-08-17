@@ -124,7 +124,8 @@ public class DefaultStudentService implements
 	public Response updateStudents(String sid, HttpHeaders headers,
 			String studentSession) {
 		try {
-			Student s = this.update(sid, headers.getRequestHeaders(), studentSession);
+			Student s = this.update(sid, headers.getRequestHeaders(),
+					studentSession);
 			State state = new State(s);
 			ResponseBuilder builder = Response.ok(state);
 			builder.entity(state.toString());
@@ -222,8 +223,9 @@ public class DefaultStudentService implements
 		}
 	}
 
-	public Student update(String sid, MultivaluedMap<String,String> data,
-			String studentSession) throws StudentException, DatabaseException, AuthException {
+	public Student update(String sid, MultivaluedMap<String, String> data,
+			String studentSession) throws StudentException, DatabaseException,
+			AuthException {
 		SessionFactory sf = null;
 		Session session = null;
 		Transaction tx = null;
@@ -240,10 +242,10 @@ public class DefaultStudentService implements
 				throw new StudentException("No student found!");
 			Student s = list.get(0);
 			this.authorization(s, studentSession);
-			if ( data.containsKey("data_name")) {
+			if (data.containsKey("data_name")) {
 				s.setName(data.get("data_name").get(0));
 			}
-			if ( data.containsKey("data_password")) {
+			if (data.containsKey("data_password")) {
 				s.setPassword(data.get("data_password").get(0));
 			}
 			session.save(s);
@@ -259,8 +261,7 @@ public class DefaultStudentService implements
 		}
 	}
 
-	public void authorization(Student s, String session)
-			throws AuthException {
+	public void authorization(Student s, String session) throws AuthException {
 		if (s.getSession() == null)
 			throw new AuthException("Invalid session");
 		if (s.getSession().length() < 3)
@@ -423,9 +424,9 @@ public class DefaultStudentService implements
 			return builder.build();
 		}
 	}
-	
-	public List<Professor> add(String sid, String pid,
-			String studentSession) throws StudentException, DatabaseException, AuthException{
+
+	public List<Professor> add(String sid, String pid, String studentSession)
+			throws StudentException, DatabaseException, AuthException {
 		SessionFactory sf = null;
 		Session session = null;
 		Transaction tx = null;
@@ -448,13 +449,15 @@ public class DefaultStudentService implements
 			if (query.list().size() == 0)
 				throw new StudentException("No Professor found!");
 			Professor professor = (Professor) query.list().get(0);
-			if ( student.preferProfessorsList().contains(professor) )
+			if (student.preferProfessorsList().contains(professor))
 				throw new StudentException("Professor has already been added!");
 			int weight = 0;
-			if ( student.getPreferList().size() > 0 ) {
-				weight = student.getPreferList().get(student.getPreferList().size()-1).getKey();
+			if (student.getPreferList().size() > 0) {
+				weight = student.getPreferList()
+						.get(student.getPreferList().size() - 1).getWeight() + 1;
 			}
-			StudentPreferenceItem item = new StudentPreferenceItem(student,professor,weight);
+			StudentPreferenceItem item = new StudentPreferenceItem(student,
+					professor, weight);
 			student.getPreferList().add(item);
 			session.save(student);
 			return student.preferProfessorsList();
@@ -500,9 +503,10 @@ public class DefaultStudentService implements
 			return builder.build();
 		}
 	}
-	
+
 	public List<Professor> swap(String sid, String pid1, String pid2,
-			String studentSession) throws StudentException, DatabaseException, AuthException{
+			String studentSession) throws StudentException, DatabaseException,
+			AuthException {
 		SessionFactory sf = null;
 		Session session = null;
 		Transaction tx = null;
@@ -523,18 +527,20 @@ public class DefaultStudentService implements
 			query = session.createQuery(hql);
 			query.setString("pid1", pid1);
 			if (query.list().size() == 0)
-				throw new StudentException("No Professor found! pid:"+pid1);
+				throw new StudentException("No Professor found! pid:" + pid1);
 			Professor professor1 = (Professor) query.list().get(0);
-			if ( !student.preferProfessorsList().contains(professor1) )
-				throw new StudentException("Professor(pid:"+pid1+") has not been added!");
+			if (!student.preferProfessorsList().contains(professor1))
+				throw new StudentException("Professor(pid:" + pid1
+						+ ") has not been added!");
 			hql = "from Professor where PID=:pid2";
 			query = session.createQuery(hql);
 			query.setString("pid2", pid2);
 			if (query.list().size() == 0)
-				throw new StudentException("No Professor found! pid:"+pid1);
+				throw new StudentException("No Professor found! pid:" + pid1);
 			Professor professor2 = (Professor) query.list().get(0);
-			if ( !student.preferProfessorsList().contains(professor2) )
-				throw new StudentException("Professor(pid:"+pid2+") has not been added!");
+			if (!student.preferProfessorsList().contains(professor2))
+				throw new StudentException("Professor(pid:" + pid2
+						+ ") has not been added!");
 			student.swap(professor1, professor2);
 			return student.preferProfessorsList();
 		} catch (HibernateException e) {

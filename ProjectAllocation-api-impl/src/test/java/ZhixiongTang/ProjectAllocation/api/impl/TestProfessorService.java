@@ -130,9 +130,9 @@ public class TestProfessorService {
 
 	@Test
 	public void testGetInformation() {
-		ProfessorService service = JAXRSClientFactory.create("http://localhost:"
-				+ port + "/" + getRestServicesPath() + "/services/",
-				ProfessorService.class);
+		ProfessorService service = JAXRSClientFactory.create(
+				"http://localhost:" + port + "/" + getRestServicesPath()
+						+ "/services/", ProfessorService.class);
 		SessionFactory sf = new Configuration().configure()
 				.buildSessionFactory();
 		Session session = sf.openSession();
@@ -162,9 +162,9 @@ public class TestProfessorService {
 
 	@Test
 	public void testGetPreferenceList() {
-		ProfessorService service = JAXRSClientFactory.create("http://localhost:"
-				+ port + "/" + getRestServicesPath() + "/services/",
-				ProfessorService.class);
+		ProfessorService service = JAXRSClientFactory.create(
+				"http://localhost:" + port + "/" + getRestServicesPath()
+						+ "/services/", ProfessorService.class);
 		SessionFactory sf = new Configuration().configure()
 				.buildSessionFactory();
 		Session session = sf.openSession();
@@ -199,9 +199,9 @@ public class TestProfessorService {
 
 	@Test
 	public void testLogin() {
-		ProfessorService service = JAXRSClientFactory.create("http://localhost:"
-				+ port + "/" + getRestServicesPath() + "/services/",
-				ProfessorService.class);
+		ProfessorService service = JAXRSClientFactory.create(
+				"http://localhost:" + port + "/" + getRestServicesPath()
+						+ "/services/", ProfessorService.class);
 		Response response = service.loginProfessor("p1", "");
 		InputStream inputStream = (InputStream) response.getEntity();
 		String theString = null;
@@ -217,10 +217,11 @@ public class TestProfessorService {
 
 	@Test
 	public void testLogout() {
-		ProfessorService service = JAXRSClientFactory.create("http://localhost:"
-				+ port + "/" + getRestServicesPath() + "/services/",
-				ProfessorService.class);
-		Response response = service.logoutProfessor("p1", "3e051af3f56067d8526cc1237134fcc8");
+		ProfessorService service = JAXRSClientFactory.create(
+				"http://localhost:" + port + "/" + getRestServicesPath()
+						+ "/services/", ProfessorService.class);
+		Response response = service.logoutProfessor("p1",
+				"3e051af3f56067d8526cc1237134fcc8");
 		InputStream inputStream = (InputStream) response.getEntity();
 		String theString = null;
 		try {
@@ -234,9 +235,9 @@ public class TestProfessorService {
 
 	@Test
 	public void testDelete() {
-		ProfessorService service = JAXRSClientFactory.create("http://localhost:"
-				+ port + "/" + getRestServicesPath() + "/services/",
-				ProfessorService.class);
+		ProfessorService service = JAXRSClientFactory.create(
+				"http://localhost:" + port + "/" + getRestServicesPath()
+						+ "/services/", ProfessorService.class);
 		Response response = service.deletePreferStudent("p1", "s3",
 				"3e051af3f56067d8526cc1237134fcc8");
 		InputStream inputStream = (InputStream) response.getEntity();
@@ -263,6 +264,31 @@ public class TestProfessorService {
 
 	@Test
 	public void testAdd() {
+		ProfessorService service = JAXRSClientFactory.create(
+				"http://localhost:" + port + "/" + getRestServicesPath()
+						+ "/services/", ProfessorService.class);
+		Response response = service.addPreferStudent("p1", "s2",
+				"3e051af3f56067d8526cc1237134fcc8");
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = new JSONObject(theString);
+		assertEquals("success", jsonObject.getString("status"));
+		response = service.addPreferStudent("p1", "s2",
+				"3e051af3f56067d8526cc1237134fcc8");
+		inputStream = (InputStream) response.getEntity();
+		theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		jsonObject = new JSONObject(theString);
+		assertEquals("fail", jsonObject.getString("status"));
 	}
 
 	@Test
