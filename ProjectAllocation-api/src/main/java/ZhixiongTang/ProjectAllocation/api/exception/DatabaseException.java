@@ -1,4 +1,4 @@
-package ZhixiongTang.ProjectAllocation.api;
+package ZhixiongTang.ProjectAllocation.api.exception;
 
 public class DatabaseException extends Exception {
 

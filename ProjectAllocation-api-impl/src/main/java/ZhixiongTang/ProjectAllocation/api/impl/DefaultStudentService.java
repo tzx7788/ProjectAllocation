@@ -20,9 +20,9 @@ import org.hibernate.cfg.Configuration;
 import org.json.JSONArray;
 import org.springframework.stereotype.Service;
 
-import ZhixiongTang.ProjectAllocation.api.AuthException;
-import ZhixiongTang.ProjectAllocation.api.DatabaseException;
-import ZhixiongTang.ProjectAllocation.api.StudentException;
+import ZhixiongTang.ProjectAllocation.api.exception.AuthException;
+import ZhixiongTang.ProjectAllocation.api.exception.DatabaseException;
+import ZhixiongTang.ProjectAllocation.api.exception.StudentException;
 
 @Service("studentService#default")
 public class DefaultStudentService implements

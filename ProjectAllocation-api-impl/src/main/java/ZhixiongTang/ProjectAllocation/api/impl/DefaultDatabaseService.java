@@ -14,9 +14,9 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Service;
 
-import ZhixiongTang.ProjectAllocation.api.AuthException;
-import ZhixiongTang.ProjectAllocation.api.DatabaseException;
 import ZhixiongTang.ProjectAllocation.api.DatabaseService;
+import ZhixiongTang.ProjectAllocation.api.exception.AuthException;
+import ZhixiongTang.ProjectAllocation.api.exception.DatabaseException;
 
 @Service("databaseService#default")
 public class DefaultDatabaseService implements DatabaseService {

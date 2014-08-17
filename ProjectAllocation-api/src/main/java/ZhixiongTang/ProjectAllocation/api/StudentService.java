@@ -17,6 +17,10 @@ import javax.ws.rs.core.Response;
 import org.ProjectAllocation.model.Professor;
 import org.ProjectAllocation.model.Student;
 
+import ZhixiongTang.ProjectAllocation.api.exception.AuthException;
+import ZhixiongTang.ProjectAllocation.api.exception.DatabaseException;
+import ZhixiongTang.ProjectAllocation.api.exception.StudentException;
+
 @Path("StudentService")
 public interface StudentService {
 	@Path("information/{sid}")
