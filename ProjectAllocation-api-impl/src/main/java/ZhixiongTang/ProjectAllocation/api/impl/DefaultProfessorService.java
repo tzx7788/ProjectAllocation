@@ -15,6 +15,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.json.JSONArray;
 import org.springframework.stereotype.Service;
 
 import ZhixiongTang.ProjectAllocation.api.ProfessorService;
@@ -28,8 +29,8 @@ public class DefaultProfessorService implements ProfessorService {
 
 	public Response getInformationFromPID(String pid) {
 		try {
-			Professor s = this.findProfessor(pid);
-			State state = new State(s);
+			Professor p = this.findProfessor(pid);
+			State state = new State(p);
 			ResponseBuilder builder = Response.ok(state);
 			builder.entity(state.toString());
 			return builder.build();
@@ -49,8 +50,29 @@ public class DefaultProfessorService implements ProfessorService {
 	}
 
 	public Response getPreferenceListFromPID(String pid) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			List<Student> list = this.findPreferStudentsList(pid);
+			JSONArray result = new JSONArray();
+			for (Student student : list) {
+				result.put(student.toJSONObject());
+			}
+			State state = new State(result);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (ProfessorException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
 	}
 
 	public Response loginProfessor(String pid, String password) {
@@ -146,8 +168,30 @@ public class DefaultProfessorService implements ProfessorService {
 
 	public List<Student> findPreferStudentsList(String pid)
 			throws ProfessorException, DatabaseException {
-		// TODO Auto-generated method stub
-		return null;
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Professor where PID=:pid";
+			Query query = session.createQuery(hql);
+			query.setString("pid", pid);
+			@SuppressWarnings("unchecked")
+			List<Professor> list = query.list();
+			if (list.size() == 0)
+				throw new ProfessorException("No professor found!");
+			List<Student> result = list.get(0).preferStudentsList();
+			return result;
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 	public List<Student> add(String pid, String sid, String professorSession)

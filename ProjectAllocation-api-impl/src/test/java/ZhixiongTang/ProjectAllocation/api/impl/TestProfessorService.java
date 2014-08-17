@@ -160,6 +160,39 @@ public class TestProfessorService {
 
 	@Test
 	public void testGetPreferenceList() {
+		ProfessorService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				ProfessorService.class);
+		SessionFactory sf = new Configuration().configure()
+				.buildSessionFactory();
+		Session session = sf.openSession();
+		Transaction tx = session.beginTransaction();
+		String hql = "from Professor where PID=:pid";
+		Query query = session.createQuery(hql);
+		query.setString("pid", "p1");
+		Professor p = (Professor) query.list().get(0);
+		List<Student> list = p.preferStudentsList();
+		tx.commit();
+		session.close();
+		Response response = service.getPreferenceListFromPID("p1");
+		System.out.println(response.getMetadata());
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = new JSONObject(theString);
+		JSONArray array = jsonObject.getJSONArray("data");
+		assertEquals(list.size(), array.length());
+		for (int index = 0; index < list.size(); index++) {
+			System.out.println(array.getJSONObject(index).get("sid"));
+			assertEquals(list.get(index).getSid().toString(), array
+					.getJSONObject(index).get("sid"));
+			assertEquals(list.get(index).getName().toString(), array
+					.getJSONObject(index).get("name"));
+		}
 	}
 
 	@Test
