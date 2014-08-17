@@ -75,7 +75,7 @@ public interface ProfessorService {
 	List<Student> delete(String pid, String sid, String professorSession)
 			throws ProfessorException, DatabaseException, AuthException;
 
-	Student update(String pid, MultivaluedMap<String, String> data,
+	Professor update(String pid, MultivaluedMap<String, String> data,
 			String professorSession) throws ProfessorException, DatabaseException,
 			AuthException;
 

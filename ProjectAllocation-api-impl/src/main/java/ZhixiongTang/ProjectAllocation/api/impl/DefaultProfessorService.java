@@ -101,8 +101,31 @@ public class DefaultProfessorService implements ProfessorService {
 
 	public Response updateProfessor(String pid, HttpHeaders headers,
 			String session) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Professor p = this.update(pid, headers.getRequestHeaders(), session);
+			State state = new State(p);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (ProfessorException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (AuthException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
 	}
 
 	public Response logoutProfessor(String pid, String professorSession) {
@@ -151,15 +174,19 @@ public class DefaultProfessorService implements ProfessorService {
 		return null;
 	}
 
-	public Student update(String pid, MultivaluedMap<String, String> data,
+	public Professor update(String pid, MultivaluedMap<String, String> data,
 			String professorSession) throws ProfessorException,
 			DatabaseException, AuthException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public void authorization(Professor p, String session) throws AuthException {
-		// TODO Auto-generated method stub
+		if (p.getSession() == null)
+			throw new AuthException("Invalid session");
+		if (p.getSession().length() < 3)
+			throw new AuthException("Invalid session");
+		if (!p.getSession().equals(session))
+			throw new AuthException("Invalid session");
 
 	}
 

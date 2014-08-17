@@ -441,6 +441,7 @@ public class DefaultStudentService implements
 			if (list.size() == 0)
 				throw new StudentException("No student found!");
 			Student student = list.get(0);
+			this.authorization(student, studentSession);
 			hql = "from Professor where PID=:pid";
 			query = session.createQuery(hql);
 			query.setString("pid", pid);
@@ -517,6 +518,7 @@ public class DefaultStudentService implements
 			if (list.size() == 0)
 				throw new StudentException("No student found!");
 			Student student = list.get(0);
+			this.authorization(student, studentSession);
 			hql = "from Professor where PID=:pid1";
 			query = session.createQuery(hql);
 			query.setString("pid1", pid1);
