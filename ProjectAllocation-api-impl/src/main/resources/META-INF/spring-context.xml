@@ -39,6 +39,7 @@
 		<jaxrs:serviceBeans>
 			<ref bean="studentService#default" />			
 			<ref bean="databaseService#default" />
+			<ref bean="professorService#default"/>
 		</jaxrs:serviceBeans>
 	</jaxrs:server>
 
