@@ -24,7 +24,6 @@ import ZhixiongTang.ProjectAllocation.api.ProfessorService;
 import ZhixiongTang.ProjectAllocation.api.exception.AuthException;
 import ZhixiongTang.ProjectAllocation.api.exception.DatabaseException;
 import ZhixiongTang.ProjectAllocation.api.exception.ProfessorException;
-import ZhixiongTang.ProjectAllocation.api.exception.StudentException;
 
 @Service("professorService#default")
 public class DefaultProfessorService implements ProfessorService {
@@ -220,8 +219,35 @@ public class DefaultProfessorService implements ProfessorService {
 
 	public Response swapPreferStudent(String pid, String sid1, String sid2,
 			String professorSession) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			List<Student> list = this.swap(pid, sid1, sid2, professorSession);
+			JSONArray result = new JSONArray();
+			for (Student student : list) {
+				result.put(student.toJSONObject());
+			}
+			State state = new State(result);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (ProfessorException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (AuthException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
 	}
 
 	public List<Student> delete(String pid, String sid, String professorSession)
@@ -479,10 +505,53 @@ public class DefaultProfessorService implements ProfessorService {
 	}
 
 	public List<Student> swap(String pid, String sid1, String sid2,
-			String studentSession) throws ProfessorException,
+			String professorSession) throws ProfessorException,
 			DatabaseException, AuthException {
-		// TODO Auto-generated method stub
-		return null;
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Professor where PID=:pid";
+			Query query = session.createQuery(hql);
+			query.setString("pid", pid);
+			@SuppressWarnings("unchecked")
+			List<Professor> list = query.list();
+			if (list.size() == 0)
+				throw new ProfessorException("No professor found!");
+			this.authorization(list.get(0), professorSession);
+			Professor professor = list.get(0);
+			hql = "from Student where SID=:sid1";
+			query = session.createQuery(hql);
+			query.setString("sid1", sid1);
+			if (query.list().size() == 0)
+				throw new ProfessorException("No student:" + sid1 + " found!");
+			Student student1 = (Student) query.list().get(0);
+			if (!professor.preferStudentsList().contains(student1))
+				throw new ProfessorException("student:" + sid1
+						+ " has not been added");
+			hql = "from Student where SID=:sid2";
+			query = session.createQuery(hql);
+			query.setString("sid2", sid2);
+			if (query.list().size() == 0)
+				throw new ProfessorException("No student:" + sid2 + " found!");
+			Student student2 = (Student) query.list().get(0);
+			if (!professor.preferStudentsList().contains(student2))
+				throw new ProfessorException("student:" + sid2
+						+ " has not been added");
+			professor.swap(student1, student2);
+			List<Student> result = professor.preferStudentsList();
+			return result;
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 }
