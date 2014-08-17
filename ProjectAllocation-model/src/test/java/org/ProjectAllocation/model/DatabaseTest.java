@@ -244,4 +244,5 @@ public class DatabaseTest extends TestCase {
 		tx.commit();
 		session.close();
 	}
+	
 }
