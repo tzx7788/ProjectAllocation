@@ -34,11 +34,17 @@ public interface StudentService {
 			@HeaderParam("data_name") String name,
 			@HeaderParam("data_password") String password,
 			@HeaderParam("session") String session);
-	
+
 	@Path("logout")
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response logoutStudent(@HeaderParam("sid") String sid,
 			@HeaderParam("session") String studentSession);
-	
+
+	@Path("delete")
+	@POST
+	@Produces({ MediaType.APPLICATION_JSON })
+	Response deletePreferProfessor(@HeaderParam("sid") String sid,
+			@HeaderParam("pid") String pid,
+			@HeaderParam("session") String studentSession);
 }
