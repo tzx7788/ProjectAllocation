@@ -35,7 +35,6 @@ import org.junit.runners.JUnit4;
 import org.springframework.web.context.ContextLoaderListener;
 
 import ZhixiongTang.ProjectAllocation.api.ProfessorService;
-import ZhixiongTang.ProjectAllocation.api.StudentService;
 
 @RunWith(JUnit4.class)
 public class TestProfessorService {
