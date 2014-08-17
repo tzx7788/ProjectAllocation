@@ -8,6 +8,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.ProjectAllocation.model.Professor;
+import org.ProjectAllocation.model.ProfessorPreferenceItem;
 import org.ProjectAllocation.model.SessionGenerator;
 import org.ProjectAllocation.model.Student;
 import org.hibernate.HibernateException;
@@ -152,8 +153,35 @@ public class DefaultProfessorService implements ProfessorService {
 
 	public Response deletePreferStudent(String pid, String sid,
 			String professorSession) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			List<Student> list = this.delete(pid, sid, professorSession);
+			JSONArray result = new JSONArray();
+			for (Student student : list) {
+				result.put(student.toJSONObject());
+			}
+			State state = new State(result);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (ProfessorException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (AuthException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
 	}
 
 	public Response addPreferStudent(String pid, String sid,
@@ -170,8 +198,40 @@ public class DefaultProfessorService implements ProfessorService {
 
 	public List<Student> delete(String pid, String sid, String professorSession)
 			throws ProfessorException, DatabaseException, AuthException {
-		// TODO Auto-generated method stub
-		return null;
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Professor where PID=:pid";
+			Query query = session.createQuery(hql);
+			query.setString("pid", pid);
+			@SuppressWarnings("unchecked")
+			List<Professor> list = query.list();
+			if (list.size() == 0)
+				throw new ProfessorException("No professor found!");
+			this.authorization(list.get(0), professorSession);
+			List<ProfessorPreferenceItem> preferList = list.get(0).getPreferList();
+			for (ProfessorPreferenceItem item : preferList) {
+				if (item.getStudent().getSid().equals(sid)) {
+					preferList.remove(item);
+					session.delete(item);
+					item.getStudent().getLikedBy().remove(item);
+					List<Student> result = list.get(0).preferStudentsList();
+					return result;
+				}
+			}
+			throw new ProfessorException("No student found!");
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 	public Professor update(String pid, MultivaluedMap<String, String> data,
