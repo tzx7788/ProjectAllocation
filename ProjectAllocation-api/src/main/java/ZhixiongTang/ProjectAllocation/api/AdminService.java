@@ -29,26 +29,26 @@ public interface AdminService {
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response logoutStudent(@HeaderParam("aid") String aid,
-			@HeaderParam("session") String studentSession);
+			@HeaderParam("session") String adminSession);
 
 	@Path("matching")
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response matching(@HeaderParam("aid") String aid,
-			@HeaderParam("session") String studentSession,
+			@HeaderParam("session") String adminSession,
 			@HeaderParam("isFinished") Boolean isFinished);
 
 	@Path("students")
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response getAllStudents(@HeaderParam("aid") String aid,
-			@HeaderParam("session") String studentSession);
+			@HeaderParam("session") String adminSession);
 
 	@Path("students/add")
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response addStudent(@HeaderParam("aid") String aid,
-			@HeaderParam("session") String studentSession,
+			@HeaderParam("session") String adminSession,
 			@Context HttpHeaders headers);
 
 	@Path("professors/delete")
@@ -56,19 +56,19 @@ public interface AdminService {
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response deleteStudent(@HeaderParam("aid") String aid,
 			@HeaderParam("sid") String sid,
-			@HeaderParam("session") String studentSession);
+			@HeaderParam("session") String adminSession);
 	
 	@Path("professors")
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response getAllProfessors(@HeaderParam("aid") String aid,
-			@HeaderParam("session") String studentSession);
+			@HeaderParam("session") String adminSession);
 
 	@Path("professors/add")
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response addProfessor(@HeaderParam("aid") String aid,
-			@HeaderParam("session") String studentSession,
+			@HeaderParam("session") String adminSession,
 			@Context HttpHeaders headers);
 
 	@Path("professors/delete")
@@ -76,5 +76,5 @@ public interface AdminService {
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response deleteProfessor(@HeaderParam("aid") String aid,
 			@HeaderParam("pid") String pid,
-			@HeaderParam("session") String studentSession);
+			@HeaderParam("session") String adminSession);
 }
