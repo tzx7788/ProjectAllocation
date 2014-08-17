@@ -87,7 +87,7 @@ public class DefaultDatabaseService implements DatabaseService {
 			session.createSQLQuery("DELETE FROM Professor").executeUpdate();
 			session.createSQLQuery("DELETE FROM SPreference").executeUpdate();
 			session.createSQLQuery("DELETE FROM PPreference").executeUpdate();
-//			session.createSQLQuery("DELETE FROM Adminß").executeUpdate();
+			session.createSQLQuery("DELETE FROM Admin").executeUpdate();
 			tx.commit();
 			session.close();
 		} catch (HibernateException e) {
