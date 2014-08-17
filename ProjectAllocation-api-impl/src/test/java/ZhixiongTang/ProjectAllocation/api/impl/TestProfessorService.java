@@ -33,6 +33,7 @@ import org.junit.runners.JUnit4;
 import org.springframework.web.context.ContextLoaderListener;
 
 import ZhixiongTang.ProjectAllocation.api.ProfessorService;
+import ZhixiongTang.ProjectAllocation.api.StudentService;
 
 @RunWith(JUnit4.class)
 public class TestProfessorService {
@@ -197,6 +198,20 @@ public class TestProfessorService {
 
 	@Test
 	public void testLogin() {
+		ProfessorService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				ProfessorService.class);
+		Response response = service.loginProfessor("p1", "");
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = new JSONObject(theString);
+		assertEquals("success", jsonObject.getString("status"));
+		jsonObject = jsonObject.getJSONObject("data");
 	}
 
 	@Test
