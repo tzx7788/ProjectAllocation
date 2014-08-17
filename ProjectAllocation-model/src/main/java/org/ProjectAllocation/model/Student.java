@@ -121,5 +121,19 @@ public class Student extends AbstractEntity {
 		result.put("name", this.getName());
 		return result;
 	}
+	
+	public void swap(Professor p1, Professor p2)
+	{
+		List<Professor> list = this.preferProfessorsList();
+		if ( !list.contains(p1) ) return;
+		if ( !list.contains(p2) ) return;
+		StudentPreferenceItem item1 = this.getPreferList().get(list.indexOf(p1));
+		StudentPreferenceItem item2 = this.getPreferList().get(list.indexOf(p2));
+		this.getPreferList().set(list.indexOf(p1), item2);
+		this.getPreferList().set(list.indexOf(p2), item1);
+		int weight = item1.getWeight();
+		item1.setWeight(item2.getWeight());
+		item2.setWeight(weight);
+	}
 
 }

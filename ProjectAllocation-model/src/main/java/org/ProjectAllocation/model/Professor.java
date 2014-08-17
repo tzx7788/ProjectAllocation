@@ -124,4 +124,17 @@ public class Professor extends AbstractEntity {
 	}
 
 
+	public void swap(Student s1, Student s2)
+	{
+		List<Student> list = this.preferStudentsList();
+		if ( !list.contains(s1) ) return;
+		if ( !list.contains(s2) ) return;
+		ProfessorPreferenceItem item1 = this.getPreferList().get(list.indexOf(s1));
+		ProfessorPreferenceItem item2 = this.getPreferList().get(list.indexOf(s2));
+		this.getPreferList().set(list.indexOf(s1), item2);
+		this.getPreferList().set(list.indexOf(s2), item1);
+		int weight = item1.getWeight();
+		item1.setWeight(item2.getWeight());
+		item2.setWeight(weight);
+	}
 }
