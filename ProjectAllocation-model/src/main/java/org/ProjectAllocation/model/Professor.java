@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.Type;
 import org.json.JSONObject;
 
 
@@ -23,11 +24,13 @@ public class Professor extends AbstractEntity {
 	public static final String COL_NAME = "NAME";
 	public static final String COL_PASSWORD = "PASSWORD";
 	public static final String COL_SESSION = "SESSION";
+	public static final String COL_LIMITATION = "LIMITATION";
 
 	private String pid;
 	private String name;
 	private String password;
 	private String session;
+	private Integer limit;
 
 	private List<ProfessorPreferenceItem> preferList;
 	private Set<StudentPreferenceItem> likedBy;
@@ -35,12 +38,22 @@ public class Professor extends AbstractEntity {
 	public Professor() {
 	}
 
+	public Professor(String pid, String name, Integer limit) {
+		super();
+		this.pid = pid;
+		this.name = name;
+		this.preferList = new ArrayList<ProfessorPreferenceItem>();
+		this.likedBy = new HashSet<StudentPreferenceItem>();
+		this.limit = limit;
+	}
+	
 	public Professor(String pid, String name) {
 		super();
 		this.pid = pid;
 		this.name = name;
 		this.preferList = new ArrayList<ProfessorPreferenceItem>();
 		this.likedBy = new HashSet<StudentPreferenceItem>();
+		this.limit = 1;
 	}
 
 	public void setPid(String pid) {
@@ -70,6 +83,15 @@ public class Professor extends AbstractEntity {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	@Column(name = COL_LIMITATION)
+	public Integer getLimit() {
+		return limit;
+	}
+
+	public void setLimit(Integer limit) {
+		this.limit = limit;
 	}
 	
 	@Column(name = COL_SESSION, nullable = true)
@@ -120,6 +142,7 @@ public class Professor extends AbstractEntity {
 		JSONObject result = new JSONObject();
 		result.put("pid", this.getPid());
 		result.put("name", this.getName());
+		result.put("limit",this.getLimit());
 		return result;
 	}
 

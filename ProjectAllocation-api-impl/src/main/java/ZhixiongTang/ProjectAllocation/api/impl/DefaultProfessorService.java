@@ -314,6 +314,9 @@ public class DefaultProfessorService implements ProfessorService {
 			if (data.containsKey("data_password")) {
 				p.setPassword(data.get("data_password").get(0));
 			}
+			if (data.containsKey("data_limit")) {
+				p.setLimit(Integer.parseInt(data.get("data_limit").get(0)));
+			}
 			session.save(p);
 
 			return p;
