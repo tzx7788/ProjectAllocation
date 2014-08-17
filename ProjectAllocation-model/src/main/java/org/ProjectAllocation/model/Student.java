@@ -30,6 +30,7 @@ public class Student extends AbstractEntity {
 	private String session;
 	private List<StudentPreferenceItem> preferList;
 	private Set<ProfessorPreferenceItem> likedBy;
+	private Set<Professor> result;
 
 	public Student() {
 	}
@@ -40,6 +41,7 @@ public class Student extends AbstractEntity {
 		this.name = name;
 		this.preferList = new ArrayList<StudentPreferenceItem>();
 		this.likedBy = new HashSet<ProfessorPreferenceItem>();
+		this.result = new HashSet<Professor>();
 	}
 
 	@Column(name = COL_NAME, length = 50)
@@ -59,7 +61,8 @@ public class Student extends AbstractEntity {
 
 	@Column(name = COL_PASSWORD, length = 50, nullable = false)
 	public String getPassword() {
-		if ( password == null ) password = "";
+		if (password == null)
+			password = "";
 		return password;
 	}
 
@@ -70,7 +73,7 @@ public class Student extends AbstractEntity {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
 	@Column(name = COL_SESSION, nullable = true)
 	public String getSession() {
 		return session;
@@ -80,7 +83,7 @@ public class Student extends AbstractEntity {
 		this.session = session;
 	}
 
-	@OneToMany(mappedBy="student",cascade=CascadeType.ALL)
+	@OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
 	@OrderBy("weight")
 	public List<StudentPreferenceItem> getPreferList() {
 		return preferList;
@@ -90,7 +93,7 @@ public class Student extends AbstractEntity {
 		this.preferList = preferList;
 	}
 
-	@OneToMany(mappedBy="student",cascade=CascadeType.ALL)
+	@OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
 	public Set<ProfessorPreferenceItem> getLikedBy() {
 		return likedBy;
 	}
@@ -98,14 +101,14 @@ public class Student extends AbstractEntity {
 	public void setLikedBy(Set<ProfessorPreferenceItem> likedBy) {
 		this.likedBy = likedBy;
 	}
-	
+
 	public List<Professor> preferProfessorsList() {
 		ArrayList<Professor> result = new ArrayList<Professor>();
 		for (int index = 0; index < this.getPreferList().size(); index++)
 			result.add(this.getPreferList().get(index).getProfessor());
 		return result;
 	}
-	
+
 	public Set<Professor> likedByProfessorsSet() {
 		HashSet<Professor> result = new HashSet<Professor>();
 		for (ProfessorPreferenceItem item : this.getLikedBy()) {
@@ -115,20 +118,37 @@ public class Student extends AbstractEntity {
 		return result;
 	}
 
+	@ManyToMany(targetEntity = Professor.class, cascade = { CascadeType.PERSIST,
+			CascadeType.MERGE })
+	@JoinTable(
+			name = "Result",
+			joinColumns = @JoinColumn(name = COL_SID),
+			inverseJoinColumns = @JoinColumn(name = Professor.COL_PID))
+	public Set<Professor> getResult() {
+		return result;
+	}
+
+	public void setResult(Set<Professor> result) {
+		this.result = result;
+	}
+
 	public JSONObject toJSONObject() {
 		JSONObject result = new JSONObject();
 		result.put("sid", this.getSid());
 		result.put("name", this.getName());
 		return result;
 	}
-	
-	public void swap(Professor p1, Professor p2)
-	{
+
+	public void swap(Professor p1, Professor p2) {
 		List<Professor> list = this.preferProfessorsList();
-		if ( !list.contains(p1) ) return;
-		if ( !list.contains(p2) ) return;
-		StudentPreferenceItem item1 = this.getPreferList().get(list.indexOf(p1));
-		StudentPreferenceItem item2 = this.getPreferList().get(list.indexOf(p2));
+		if (!list.contains(p1))
+			return;
+		if (!list.contains(p2))
+			return;
+		StudentPreferenceItem item1 = this.getPreferList()
+				.get(list.indexOf(p1));
+		StudentPreferenceItem item2 = this.getPreferList()
+				.get(list.indexOf(p2));
 		this.getPreferList().set(list.indexOf(p1), item2);
 		this.getPreferList().set(list.indexOf(p2), item1);
 		int weight = item1.getWeight();

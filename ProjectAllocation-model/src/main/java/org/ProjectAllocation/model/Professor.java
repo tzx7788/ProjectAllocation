@@ -9,7 +9,6 @@ import javax.persistence.*;
 
 import org.json.JSONObject;
 
-
 @Entity
 public class Professor extends AbstractEntity {
 
@@ -33,6 +32,7 @@ public class Professor extends AbstractEntity {
 
 	private List<ProfessorPreferenceItem> preferList;
 	private Set<StudentPreferenceItem> likedBy;
+	private Set<Student> result;
 
 	public Professor() {
 	}
@@ -43,15 +43,17 @@ public class Professor extends AbstractEntity {
 		this.name = name;
 		this.preferList = new ArrayList<ProfessorPreferenceItem>();
 		this.likedBy = new HashSet<StudentPreferenceItem>();
+		this.result = new HashSet<Student>();
 		this.limit = limit;
 	}
-	
+
 	public Professor(String pid, String name) {
 		super();
 		this.pid = pid;
 		this.name = name;
 		this.preferList = new ArrayList<ProfessorPreferenceItem>();
 		this.likedBy = new HashSet<StudentPreferenceItem>();
+		this.result = new HashSet<Student>();
 		this.limit = 1;
 	}
 
@@ -76,14 +78,15 @@ public class Professor extends AbstractEntity {
 
 	@Column(name = COL_PASSWORD, nullable = false)
 	public String getPassword() {
-		if ( password == null ) password = "";
+		if (password == null)
+			password = "";
 		return password;
 	}
 
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
 	@Column(name = COL_LIMITATION)
 	public Integer getLimit() {
 		return limit;
@@ -92,7 +95,7 @@ public class Professor extends AbstractEntity {
 	public void setLimit(Integer limit) {
 		this.limit = limit;
 	}
-	
+
 	@Column(name = COL_SESSION, nullable = true)
 	public String getSession() {
 		return session;
@@ -121,13 +124,13 @@ public class Professor extends AbstractEntity {
 		return likedBy;
 	}
 
-	public List<Student>preferStudentsList() {
+	public List<Student> preferStudentsList() {
 		ArrayList<Student> result = new ArrayList<Student>();
 		for (int index = 0; index < this.getPreferList().size(); index++)
 			result.add(this.getPreferList().get(index).getStudent());
 		return result;
 	}
-	
+
 	public Set<Student> likedByStudentsSet() {
 		HashSet<Student> result = new HashSet<Student>();
 		for (StudentPreferenceItem item : this.getLikedBy()) {
@@ -137,22 +140,38 @@ public class Professor extends AbstractEntity {
 		return result;
 	}
 
+	@ManyToMany(targetEntity = Student.class, cascade = { CascadeType.PERSIST,
+			CascadeType.MERGE })
+	@JoinTable(
+			name = "Result",
+			joinColumns = @JoinColumn(name = COL_PID),
+			inverseJoinColumns = @JoinColumn(name = Student.COL_SID))
+	public Set<Student> getResult() {
+		return result;
+	}
+
+	public void setResult(Set<Student> result) {
+		this.result = result;
+	}
+
 	public JSONObject toJSONObject() {
 		JSONObject result = new JSONObject();
 		result.put("pid", this.getPid());
 		result.put("name", this.getName());
-		result.put("limit",this.getLimit());
+		result.put("limit", this.getLimit());
 		return result;
 	}
 
-
-	public void swap(Student s1, Student s2)
-	{
+	public void swap(Student s1, Student s2) {
 		List<Student> list = this.preferStudentsList();
-		if ( !list.contains(s1) ) return;
-		if ( !list.contains(s2) ) return;
-		ProfessorPreferenceItem item1 = this.getPreferList().get(list.indexOf(s1));
-		ProfessorPreferenceItem item2 = this.getPreferList().get(list.indexOf(s2));
+		if (!list.contains(s1))
+			return;
+		if (!list.contains(s2))
+			return;
+		ProfessorPreferenceItem item1 = this.getPreferList().get(
+				list.indexOf(s1));
+		ProfessorPreferenceItem item2 = this.getPreferList().get(
+				list.indexOf(s2));
 		this.getPreferList().set(list.indexOf(s1), item2);
 		this.getPreferList().set(list.indexOf(s2), item1);
 		int weight = item1.getWeight();

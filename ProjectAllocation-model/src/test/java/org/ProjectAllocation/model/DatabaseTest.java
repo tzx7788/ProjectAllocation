@@ -31,12 +31,16 @@ public class DatabaseTest extends TestCase {
 		session.createSQLQuery("DELETE FROM SPreference").executeUpdate();
 		session.createSQLQuery("DELETE FROM PPreference").executeUpdate();
 		session.createSQLQuery("DELETE FROM Admin").executeUpdate();
+		session.createSQLQuery("DELETE FROM Result").executeUpdate();
 		Student s1 = new Student("s1", "tzx1");
 		Student s2 = new Student("s2", "tzx2");
 		Student s3 = new Student("s3", "tzx3");
 		Professor p1 = new Professor("p1", "haha1");
 		Professor p2 = new Professor("p2", "haha1");
 		Professor p3 = new Professor("p3", "haha1");
+		s1.getResult().add(p1);
+		s1.getResult().add(p2);
+		p1.getResult().add(s1);
 		Admin a1 = new Admin("a1","admin");
 		session.save(a1);
 		session.save(s1);
@@ -178,6 +182,9 @@ public class DatabaseTest extends TestCase {
 		assertTrue(p3.likedByStudentsSet().contains(s1));
 		assertFalse(p1.likedByStudentsSet().contains(s1));
 		assertEquals(s1.getName(), "tzxtzx");
+		System.out.println("haha"+s1.getResult().toString());
+		s1.getResult().remove(p1);
+		p1.getResult().remove(s1);
 		tx.commit();
 		session.close();
 	}
