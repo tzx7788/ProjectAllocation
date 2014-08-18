@@ -122,6 +122,7 @@ public class DefaultDatabaseService implements DatabaseService {
 			session.save(p1);
 			session.save(p2);
 			session.save(p3);
+			session.save(a1);
 			StudentPreferenceItem sr1 = new StudentPreferenceItem(s1, p1, 0);
 			StudentPreferenceItem sr2 = new StudentPreferenceItem(s1, p2, 1);
 			StudentPreferenceItem sr3 = new StudentPreferenceItem(s2, p1, 2);

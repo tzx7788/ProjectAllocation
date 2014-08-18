@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.ProjectAllocation.model.Admin;
 import org.ProjectAllocation.model.Professor;
+import org.ProjectAllocation.model.SessionGenerator;
 import org.ProjectAllocation.model.Student;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -25,6 +26,7 @@ import ZhixiongTang.ProjectAllocation.api.AdminService;
 import ZhixiongTang.ProjectAllocation.api.exception.AdminException;
 import ZhixiongTang.ProjectAllocation.api.exception.AuthException;
 import ZhixiongTang.ProjectAllocation.api.exception.DatabaseException;
+import ZhixiongTang.ProjectAllocation.api.exception.StudentException;
 
 @Service("adminService#default")
 public class DefaultAdminService implements AdminService {
@@ -52,7 +54,29 @@ public class DefaultAdminService implements AdminService {
 	}
 
 	public Admin findAdmin(String aid) throws AdminException, DatabaseException {
-		return null;
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Admin where AID=:aid";
+			Query query = session.createQuery(hql);
+			query.setString("aid", aid);
+			@SuppressWarnings("unchecked")
+			List<Admin> list = query.list();
+			if (list.size() == 0)
+				throw new AdminException("No Admin found!");
+			return list.get(0);
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 	public Response loginAdmin(String aid, String password) {
@@ -80,7 +104,37 @@ public class DefaultAdminService implements AdminService {
 
 	public Admin login(String aid, String password) throws AdminException,
 			DatabaseException {
-		return null;
+		if (aid == null)
+			throw new AdminException("No Admin ID input");
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Admin where aID=:aid";
+			Query query = session.createQuery(hql);
+			query.setString("aid", aid);
+			@SuppressWarnings("unchecked")
+			List<Admin> list = query.list();
+			if (list.size() == 0)
+				throw new AdminException("No Admin found!");
+			Admin a = list.get(0);
+			if (!a.getPassword().equals(password))
+				throw new AdminException("Wrong password!");
+			a.setSession(SessionGenerator.generateSession());
+			session.save(a);
+			return a;
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
+
 	}
 
 	public Response logoutAdmin(String aid, String adminSession) {
@@ -184,7 +238,8 @@ public class DefaultAdminService implements AdminService {
 			HttpHeaders headers) {
 		try {
 			this.authorization(aid, adminSession);
-			State state = new State(this.addStudent(headers.getRequestHeaders()).toJSONObject());
+			State state = new State(this
+					.addStudent(headers.getRequestHeaders()).toJSONObject());
 			ResponseBuilder builder = Response.ok(state);
 			builder.entity(state.toString());
 			return builder.build();
@@ -208,8 +263,8 @@ public class DefaultAdminService implements AdminService {
 			return builder.build();
 		}
 	}
-	
-	public Student addStudent( MultivaluedMap<String, String> data) {
+
+	public Student addStudent(MultivaluedMap<String, String> data) {
 		return null;
 	}
 
@@ -241,7 +296,7 @@ public class DefaultAdminService implements AdminService {
 			return builder.build();
 		}
 	}
-	
+
 	public void deleteStudent(String sid) {
 	}
 
@@ -285,7 +340,8 @@ public class DefaultAdminService implements AdminService {
 			HttpHeaders headers) {
 		try {
 			this.authorization(aid, adminSession);
-			State state = new State(this.addProfessor(headers.getRequestHeaders()).toJSONObject());
+			State state = new State(this.addProfessor(
+					headers.getRequestHeaders()).toJSONObject());
 			ResponseBuilder builder = Response.ok(state);
 			builder.entity(state.toString());
 			return builder.build();
@@ -309,8 +365,8 @@ public class DefaultAdminService implements AdminService {
 			return builder.build();
 		}
 	}
-	
-	public Student addProfessor( MultivaluedMap<String, String> data) {
+
+	public Student addProfessor(MultivaluedMap<String, String> data) {
 		return null;
 	}
 
@@ -342,42 +398,20 @@ public class DefaultAdminService implements AdminService {
 			return builder.build();
 		}
 	}
-	
+
 	public void deleteProfessor(String pid) {
-		
+
 	}
 
 	public Admin authorization(String aid, String adminSession)
 			throws AuthException, AdminException, DatabaseException {
-		SessionFactory sf = null;
-		Session session = null;
-		Transaction tx = null;
-		try {
-			sf = new Configuration().configure().buildSessionFactory();
-			session = sf.openSession();
-			tx = session.beginTransaction();
-			String hql = "from Admin where AID=:aid";
-			Query query = session.createQuery(hql);
-			query.setString("aid", aid);
-			@SuppressWarnings("unchecked")
-			List<Admin> list = query.list();
-			if (list.size() == 0)
-				throw new AdminException("No Admin found!");
-			Admin a = list.get(0);
-			if (a.getSession() == null)
-				throw new AuthException("Invalid session");
-			if (a.getSession().length() < 3)
-				throw new AuthException("Invalid session");
-			if (!a.getSession().equals(session))
-				throw new AuthException("Invalid session");
-			return a;
-		} catch (HibernateException e) {
-			throw new DatabaseException(e.getMessage());
-		} finally {
-			if (tx != null)
-				tx.commit();
-			if (session != null)
-				session.close();
-		}
+		Admin a = this.findAdmin(aid);
+		if (a.getSession() == null)
+			throw new AuthException("Invalid session");
+		if (a.getSession().length() < 3)
+			throw new AuthException("Invalid session");
+		if (!a.getSession().equals(adminSession))
+			throw new AuthException("Invalid session");
+		return a;
 	}
 }
