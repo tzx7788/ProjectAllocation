@@ -1,5 +1,6 @@
 package ZhixiongTang.ProjectAllocation.api.impl;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -262,8 +263,30 @@ public class DefaultAdminService implements AdminService {
 		}
 	}
 
-	public Set<Student> getAllStudents() {
-		return null;
+	public Set<Student> getAllStudents() throws DatabaseException {
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Student";
+			Query query = session.createQuery(hql);
+			@SuppressWarnings("unchecked")
+			List<Student> list = query.list();
+			HashSet<Student> result = new HashSet<Student>();
+			for ( Student student : list )
+				result.add(student);
+			return result;
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 	public Response addStudent(String aid, String adminSession,
@@ -364,8 +387,30 @@ public class DefaultAdminService implements AdminService {
 		}
 	}
 
-	public Set<Professor> getAllProfessors() {
-		return null;
+	public Set<Professor> getAllProfessors() throws DatabaseException {
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Professor";
+			Query query = session.createQuery(hql);
+			@SuppressWarnings("unchecked")
+			List<Professor> list = query.list();
+			HashSet<Professor> result = new HashSet<Professor>();
+			for ( Professor professor : list )
+				result.add(professor);
+			return result;
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 	public Response addProfessor(String aid, String adminSession,

@@ -13,6 +13,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.transport.servlet.CXFServlet;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -132,5 +133,45 @@ public class TestAdminService {
 		System.out.println(theString);
 		JSONObject jsonObject = new JSONObject(theString);
 		assertEquals("success", jsonObject.get("status"));
+	}
+	
+	@Test
+	public void testGetAllStudent(){
+		AdminService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				AdminService.class);
+		Response response = service.getAllStudents("a1", "3e051af3f56067d8526cc1237134fcc8");
+		System.out.println(response.getMetadata());
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(theString);
+		JSONObject jsonObject = new JSONObject(theString);
+		JSONArray array = jsonObject.getJSONArray("data");
+		assertEquals(3, array.length());
+	}
+	
+	@Test
+	public void testGetAllProfessor(){
+		AdminService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				AdminService.class);
+		Response response = service.getAllProfessors("a1", "3e051af3f56067d8526cc1237134fcc8");
+		System.out.println(response.getMetadata());
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(theString);
+		JSONObject jsonObject = new JSONObject(theString);
+		JSONArray array = jsonObject.getJSONArray("data");
+		assertEquals(3, array.length());
 	}
 }

@@ -28,8 +28,7 @@ import ZhixiongTang.ProjectAllocation.api.exception.DatabaseException;
 import ZhixiongTang.ProjectAllocation.api.exception.StudentException;
 
 @Service("studentService#default")
-public class DefaultStudentService implements
-		StudentService {
+public class DefaultStudentService implements StudentService {
 
 	public Response getInformationFromSID(String sid) {
 		try {
@@ -582,8 +581,8 @@ public class DefaultStudentService implements
 		}
 	}
 
-	public Set<Professor> findResults(String sid)
-			throws StudentException, DatabaseException {
+	public Set<Professor> findResults(String sid) throws StudentException,
+			DatabaseException {
 		SessionFactory sf = null;
 		Session session = null;
 		Transaction tx = null;
@@ -599,7 +598,7 @@ public class DefaultStudentService implements
 			if (list.size() == 0)
 				throw new StudentException("No student found!");
 			Set<Professor> result = new HashSet<Professor>();
-			for ( Professor p : list.get(0).getResult() )
+			for (Professor p : list.get(0).getResult())
 				result.add(p);
 			return result;
 		} catch (HibernateException e) {
