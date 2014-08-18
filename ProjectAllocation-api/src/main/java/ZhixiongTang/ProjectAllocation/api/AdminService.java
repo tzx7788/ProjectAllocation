@@ -28,7 +28,7 @@ public interface AdminService {
 	@Path("logout")
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
-	Response logoutStudent(@HeaderParam("aid") String aid,
+	Response logoutAdmin(@HeaderParam("aid") String aid,
 			@HeaderParam("session") String adminSession);
 
 	@Path("matching")
