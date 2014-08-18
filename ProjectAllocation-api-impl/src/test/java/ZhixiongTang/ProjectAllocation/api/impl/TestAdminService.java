@@ -174,4 +174,42 @@ public class TestAdminService {
 		JSONArray array = jsonObject.getJSONArray("data");
 		assertEquals(3, array.length());
 	}
+	
+	@Test
+	public void testDeleteStudent(){
+		AdminService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				AdminService.class);
+		Response response = service.deleteStudent("a1","s1", "3e051af3f56067d8526cc1237134fcc8");
+		System.out.println(response.getMetadata());
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(theString);
+		JSONObject jsonObject = new JSONObject(theString);
+		assertEquals("success",jsonObject.get("status"));
+	}
+	
+	@Test
+	public void testDeleteProfessor(){
+		AdminService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				AdminService.class);
+		Response response = service.deleteProfessor("a1","p1", "3e051af3f56067d8526cc1237134fcc8");
+		System.out.println(response.getMetadata());
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(theString);
+		JSONObject jsonObject = new JSONObject(theString);
+		assertEquals("success",jsonObject.get("status"));
+	}
 }

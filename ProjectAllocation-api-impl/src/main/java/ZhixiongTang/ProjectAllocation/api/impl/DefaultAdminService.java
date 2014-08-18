@@ -27,7 +27,6 @@ import ZhixiongTang.ProjectAllocation.api.AdminService;
 import ZhixiongTang.ProjectAllocation.api.exception.AdminException;
 import ZhixiongTang.ProjectAllocation.api.exception.AuthException;
 import ZhixiongTang.ProjectAllocation.api.exception.DatabaseException;
-import ZhixiongTang.ProjectAllocation.api.exception.StudentException;
 
 @Service("adminService#default")
 public class DefaultAdminService implements AdminService {
@@ -395,7 +394,32 @@ public class DefaultAdminService implements AdminService {
 		}
 	}
 
-	public void deleteStudent(String sid) {
+	public void deleteStudent(String sid) throws AdminException, DatabaseException {
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Student where SID=:sid";
+			Query query = session.createQuery(hql);
+			if ( sid == null ) 
+				throw new AdminException("No student ID input");
+			query.setString("sid", sid);
+			@SuppressWarnings("unchecked")
+			List<Student> list = query.list();
+			if (list.size() == 0)
+				throw new AdminException("No student found!");
+			session.delete(list.get(0));
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 	public Response getAllProfessors(String aid, String adminSession) {
@@ -486,7 +510,8 @@ public class DefaultAdminService implements AdminService {
 		}
 	}
 
-	public Professor addProfessor(MultivaluedMap<String, String> data) throws AdminException, DatabaseException {
+	public Professor addProfessor(MultivaluedMap<String, String> data)
+			throws AdminException, DatabaseException {
 		SessionFactory sf = null;
 		Session session = null;
 		Transaction tx = null;
@@ -566,8 +591,32 @@ public class DefaultAdminService implements AdminService {
 		}
 	}
 
-	public void deleteProfessor(String pid) {
-
+	public void deleteProfessor(String pid) throws AdminException, DatabaseException {
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Professor where PID=:pid";
+			Query query = session.createQuery(hql);
+			if ( pid == null ) 
+				throw new AdminException("No Professor ID input");
+			query.setString("pid", pid);
+			@SuppressWarnings("unchecked")
+			List<Professor> list = query.list();
+			if (list.size() == 0)
+				throw new AdminException("No Professor found!");
+			session.delete(list.get(0));
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 	public Admin authorization(String aid, String adminSession)

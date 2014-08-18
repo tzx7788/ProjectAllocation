@@ -51,7 +51,7 @@ public interface AdminService {
 			@HeaderParam("session") String adminSession,
 			@Context HttpHeaders headers);
 
-	@Path("professors/delete")
+	@Path("student/delete")
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response deleteStudent(@HeaderParam("aid") String aid,
