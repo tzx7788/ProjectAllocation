@@ -113,7 +113,7 @@ public class DefaultAdminService implements AdminService {
 			sf = new Configuration().configure().buildSessionFactory();
 			session = sf.openSession();
 			tx = session.beginTransaction();
-			String hql = "from Admin where aID=:aid";
+			String hql = "from Admin where AID=:aid";
 			Query query = session.createQuery(hql);
 			query.setString("aid", aid);
 			@SuppressWarnings("unchecked")
@@ -139,7 +139,8 @@ public class DefaultAdminService implements AdminService {
 
 	public Response logoutAdmin(String aid, String adminSession) {
 		try {
-			this.logout(aid, adminSession);
+			this.authorization(aid, adminSession);
+			this.logout(aid);
 			State state = new State();
 			ResponseBuilder builder = Response.ok(state);
 			builder.entity(state.toString());
@@ -156,11 +157,42 @@ public class DefaultAdminService implements AdminService {
 			ResponseBuilder builder = Response.ok(state);
 			builder.entity(state.toString());
 			return builder.build();
+		} catch (AuthException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
 		}
 	}
 
-	public void logout(String aid, String adminSession) throws AdminException,
+	public void logout(String aid) throws AdminException,
 			DatabaseException {
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Admin where AID=:aid";
+			Query query = session.createQuery(hql);
+			query.setString("aid", aid);
+			@SuppressWarnings("unchecked")
+			List<Admin> list = query.list();
+			if (list.size() == 0)
+				throw new AdminException("No Admin found!");
+			Admin a = list.get(0);
+			a.setSession("");
+			session.save(a);
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 	public Response matching(String aid, String adminSession, Boolean isFinished) {
