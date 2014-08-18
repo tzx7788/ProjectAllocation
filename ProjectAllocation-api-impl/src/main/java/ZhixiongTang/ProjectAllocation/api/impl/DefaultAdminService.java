@@ -167,8 +167,7 @@ public class DefaultAdminService implements AdminService {
 		}
 	}
 
-	public void logout(String aid) throws AdminException,
-			DatabaseException {
+	public void logout(String aid) throws AdminException, DatabaseException {
 		SessionFactory sf = null;
 		Session session = null;
 		Transaction tx = null;
@@ -276,7 +275,7 @@ public class DefaultAdminService implements AdminService {
 			@SuppressWarnings("unchecked")
 			List<Student> list = query.list();
 			HashSet<Student> result = new HashSet<Student>();
-			for ( Student student : list )
+			for (Student student : list)
 				result.add(student);
 			return result;
 		} catch (HibernateException e) {
@@ -319,8 +318,52 @@ public class DefaultAdminService implements AdminService {
 		}
 	}
 
-	public Student addStudent(MultivaluedMap<String, String> data) {
-		return null;
+	public Student addStudent(MultivaluedMap<String, String> data)
+			throws AdminException, DatabaseException {
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String sid = null;
+			String name = null;
+			String password = null;
+			if (data.containsKey("sid"))
+				sid = data.getFirst("sid");
+			else
+				throw new AdminException("No ID input");
+			if (data.containsKey("name"))
+				name = data.getFirst("name");
+			else
+				throw new AdminException("No name input");
+			if (data.containsKey("password"))
+				name = data.getFirst("password");
+			else
+				throw new AdminException("No password input");
+			String hql = "from Student where SID=:sid";
+			Query query = session.createQuery(hql);
+			query.setString("sid", sid);
+			@SuppressWarnings("unchecked")
+			List<Student> list = query.list();
+			Student student = null;
+			if (list.size() == 0)
+				student = new Student(sid, name);
+			else
+				student = list.get(0);
+			student.setName(name);
+			student.setPassword(password);
+			session.save(student);
+			return student;
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 	public Response deleteStudent(String aid, String sid, String adminSession) {
@@ -400,7 +443,7 @@ public class DefaultAdminService implements AdminService {
 			@SuppressWarnings("unchecked")
 			List<Professor> list = query.list();
 			HashSet<Professor> result = new HashSet<Professor>();
-			for ( Professor professor : list )
+			for (Professor professor : list)
 				result.add(professor);
 			return result;
 		} catch (HibernateException e) {
@@ -443,8 +486,55 @@ public class DefaultAdminService implements AdminService {
 		}
 	}
 
-	public Student addProfessor(MultivaluedMap<String, String> data) {
-		return null;
+	public Professor addProfessor(MultivaluedMap<String, String> data) throws AdminException, DatabaseException {
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String pid = null;
+			String name = null;
+			String password = null;
+			Integer limit = 1;
+			if (data.containsKey("pid"))
+				pid = data.getFirst("pid");
+			else
+				throw new AdminException("No ID input");
+			if (data.containsKey("name"))
+				name = data.getFirst("name");
+			else
+				throw new AdminException("No name input");
+			if (data.containsKey("password"))
+				name = data.getFirst("password");
+			else
+				throw new AdminException("No password input");
+			if (data.containsKey("limit"))
+				limit = Integer.parseInt(data.getFirst("limit"));
+			String hql = "from Professor where PID=:pid";
+			Query query = session.createQuery(hql);
+			query.setString("pid", pid);
+			@SuppressWarnings("unchecked")
+			List<Professor> list = query.list();
+			Professor professor = null;
+			if (list.size() == 0)
+				professor = new Professor(pid, name);
+			else
+				professor = list.get(0);
+			professor.setName(name);
+			professor.setPassword(password);
+			professor.setLimit(limit);
+			session.save(professor);
+			return professor;
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 	public Response deleteProfessor(String aid, String pid, String adminSession) {
