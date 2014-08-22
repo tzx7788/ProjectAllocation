@@ -218,7 +218,8 @@ public class TestAdminService {
 		AdminService service = JAXRSClientFactory.create("http://localhost:"
 				+ port + "/" + getRestServicesPath() + "/services/",
 				AdminService.class);
-		Response response = service.matching("a1","3e051af3f56067d8526cc1237134fcc8", false);
+		Response response = service.matchingBegin("a1","3e051af3f56067d8526cc1237134fcc8");
+		response = service.matching("a1","3e051af3f56067d8526cc1237134fcc8",false);
 		System.out.println(response.getMetadata());
 		InputStream inputStream = (InputStream) response.getEntity();
 		String theString = null;

@@ -147,6 +147,8 @@ public class Professor extends AbstractEntity {
 			joinColumns = @JoinColumn(name = COL_PID),
 			inverseJoinColumns = @JoinColumn(name = Student.COL_SID))
 	public Set<Student> getResult() {
+		if ( result == null )
+			result = new HashSet<Student>();
 		return result;
 	}
 

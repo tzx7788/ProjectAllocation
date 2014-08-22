@@ -1,5 +1,6 @@
 package ZhixiongTang.ProjectAllocation.api.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -194,10 +195,10 @@ public class DefaultAdminService implements AdminService {
 		}
 	}
 
-	public Response matching(String aid, String adminSession, Boolean isFinished) {
+	public Response matchingBegin(String aid, String adminSession) {
 		try {
 			this.authorization(aid, adminSession);
-			JSONObject result = this.matchingStart(isFinished);
+			JSONObject result = this.matchingStart();
 			State state = new State(result);
 			ResponseBuilder builder = Response.ok(state);
 			builder.entity(state.toString());
@@ -223,8 +224,67 @@ public class DefaultAdminService implements AdminService {
 		}
 	}
 
-	public JSONObject matchingStart(Boolean isFinished) throws AdminException,
-			DatabaseException {
+	public Response matchingEnd(String aid, String adminSession) {
+		try {
+			this.authorization(aid, adminSession);
+			JSONObject result = this.matchingFinish();
+			State state = new State(result);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (AdminException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (AuthException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
+	}
+
+	public Response matching(String aid, String adminSession, Boolean isFinished) {
+		try {
+			this.authorization(aid, adminSession);
+			JSONObject result = this.matchingOneStep(isFinished);
+			State state = new State(result);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (AdminException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (AuthException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
+	}
+
+	private static Algorithm algorithm;
+
+	public JSONObject matchingStart() throws AdminException, DatabaseException {
 		SessionFactory sf = null;
 		Session session = null;
 		Transaction tx = null;
@@ -233,8 +293,111 @@ public class DefaultAdminService implements AdminService {
 			session = sf.openSession();
 			tx = session.beginTransaction();
 			JSONObject result = new JSONObject();
-			
-			//TODO
+			String hql = "from Student";
+			Query query = session.createQuery(hql);
+			@SuppressWarnings("unchecked")
+			List<Student> students = new ArrayList<Student>(query.list());
+			hql = "from Professor";
+			query = session.createQuery(hql);
+			@SuppressWarnings("unchecked")
+			List<Professor> professors = new ArrayList<Professor>(query.list());
+			algorithm = new Algorithm(students, professors);
+			algorithm.initialization();
+			algorithm.firstStep();
+			algorithm.save();
+			for (Student student : students)
+				session.save(student);
+			for (Professor professor : professors)
+				session.save(professor);
+			result.put("result", algorithm.toJSONArray());
+			result.put("isFinished", false);
+			return result;
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
+	}
+
+	public JSONObject matchingFinish() throws AdminException, DatabaseException {
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			JSONObject result = new JSONObject();
+			String hql = "from Student";
+			Query query = session.createQuery(hql);
+			@SuppressWarnings("unchecked")
+			List<Student> students = new ArrayList<Student>(query.list());
+			hql = "from Professor";
+			query = session.createQuery(hql);
+			@SuppressWarnings("unchecked")
+			List<Professor> professors = new ArrayList<Professor>(query.list());
+			algorithm = new Algorithm(students, professors);
+			algorithm.initialization();
+			algorithm.firstStep();
+			algorithm.finish();
+			algorithm.save();
+			for (Student student : students)
+				session.save(student);
+			for (Professor professor : professors)
+				session.save(professor);
+			result.put("result", algorithm.toJSONArray());
+			result.put("isFinished", true);
+			algorithm = null;
+			return result;
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
+	}
+
+	public JSONObject matchingOneStep(Boolean isFinished)
+			throws AdminException, DatabaseException {
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			JSONObject result = new JSONObject();
+			String hql = "from Student";
+			Query query = session.createQuery(hql);
+			@SuppressWarnings("unchecked")
+			List<Student> students = new ArrayList<Student>(query.list());
+			hql = "from Professor";
+			query = session.createQuery(hql);
+			@SuppressWarnings("unchecked")
+			List<Professor> professors = new ArrayList<Professor>(query.list());
+			if (algorithm == null) {
+				algorithm = new Algorithm(students, professors);
+				algorithm.initialization();
+				algorithm.firstStep();
+			}
+			algorithm.load(students, professors);
+			algorithm.initialization();
+			if (!isFinished)
+				isFinished = algorithm.oneStep();
+			algorithm.save();
+			for (Student student : algorithm.getStudents())
+				session.save(student);
+			for (Professor professor : algorithm.getProfessors())
+				session.save(professor);
+			result.put("result", algorithm.toJSONArray());
+			result.put("isFinished", isFinished);
+			if (isFinished)
+				algorithm = null;
 			return result;
 		} catch (HibernateException e) {
 			throw new DatabaseException(e.getMessage());
@@ -411,7 +574,8 @@ public class DefaultAdminService implements AdminService {
 		}
 	}
 
-	public void deleteStudent(String sid) throws AdminException, DatabaseException {
+	public void deleteStudent(String sid) throws AdminException,
+			DatabaseException {
 		SessionFactory sf = null;
 		Session session = null;
 		Transaction tx = null;
@@ -421,7 +585,7 @@ public class DefaultAdminService implements AdminService {
 			tx = session.beginTransaction();
 			String hql = "from Student where SID=:sid";
 			Query query = session.createQuery(hql);
-			if ( sid == null ) 
+			if (sid == null)
 				throw new AdminException("No student ID input");
 			query.setString("sid", sid);
 			@SuppressWarnings("unchecked")
@@ -608,7 +772,8 @@ public class DefaultAdminService implements AdminService {
 		}
 	}
 
-	public void deleteProfessor(String pid) throws AdminException, DatabaseException {
+	public void deleteProfessor(String pid) throws AdminException,
+			DatabaseException {
 		SessionFactory sf = null;
 		Session session = null;
 		Transaction tx = null;
@@ -618,7 +783,7 @@ public class DefaultAdminService implements AdminService {
 			tx = session.beginTransaction();
 			String hql = "from Professor where PID=:pid";
 			Query query = session.createQuery(hql);
-			if ( pid == null ) 
+			if (pid == null)
 				throw new AdminException("No Professor ID input");
 			query.setString("pid", pid);
 			@SuppressWarnings("unchecked")
@@ -647,4 +812,5 @@ public class DefaultAdminService implements AdminService {
 			throw new AuthException("Invalid session");
 		return a;
 	}
+
 }

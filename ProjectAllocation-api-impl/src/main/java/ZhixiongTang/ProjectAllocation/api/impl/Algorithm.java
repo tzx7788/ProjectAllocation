@@ -1,13 +1,26 @@
 package ZhixiongTang.ProjectAllocation.api.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.ProjectAllocation.model.Professor;
+import org.ProjectAllocation.model.ProfessorPreferenceItem;
 import org.ProjectAllocation.model.Student;
+import org.ProjectAllocation.model.StudentPreferenceItem;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class Algorithm {
+
+	public List<Student> getStudents() {
+		return students;
+	}
+
+	public List<Professor> getProfessors() {
+		return professors;
+	}
 
 	private static Double MAXIUM = 999.0;
 
@@ -27,6 +40,11 @@ public class Algorithm {
 		this.students = students;
 		this.professors = professors;
 	}
+	
+	public void load(List<Student> students, List<Professor> professors) {
+		this.students = students;
+		this.professors = professors;
+	}
 
 	private Double getHappiness(Student student, Professor professor) {
 		Double studentScore = MAXIUM;
@@ -34,9 +52,13 @@ public class Algorithm {
 		if (student.preferProfessorsList().contains(professor))
 			studentScore = (double) student.preferProfessorsList().indexOf(
 					professor);
+		else
+			return 2 * MAXIUM;
 		if (professor.preferStudentsList().contains(student))
 			studentScore = (double) professor.preferStudentsList().indexOf(
 					student);
+		else
+			return 2 * MAXIUM;
 		return studentScore + professorScore;
 	}
 
@@ -63,6 +85,10 @@ public class Algorithm {
 				Professor professor = this.indexProfessors.get(j);
 				this.happiness[i][j] = this.getHappiness(student, professor);
 			}
+		for ( Student student : students ) 
+			student.getResult().clear();
+		for ( Professor professor : professors )
+			professor.getResult().clear();
 	}
 
 	private double findLargest(double[][] array) {
@@ -387,6 +413,10 @@ public class Algorithm {
 	}
 	
 	public void save() {
+		for ( Student student : students ) 
+			student.getResult().clear();
+		for ( Professor professor : professors )
+			professor.getResult().clear();
 		for (int i = 0; i < mask.length; i++) {
 			for (int j = 0; j < mask[i].length; j++) {
 				if (i < happiness.length && j < happiness[0].length && mask[i][j] == 1) {
@@ -400,5 +430,57 @@ public class Algorithm {
 				}
 			}
 		}
+	}
+	
+	public JSONArray toJSONArray() {
+		JSONArray array = new JSONArray();
+		for ( Student student : students )
+			for ( Professor professor : student.getResult() ) {
+				JSONObject object = new JSONObject();
+				object.put(student.getSid(), professor.getPid());
+				array.put(object);
+			}
+		return array;
+	}
+	
+	public static void main(String[] args) {
+		Student s1 = new Student("s1", "tzx1");
+		Student s2 = new Student("s2", "tzx2");
+		Student s3 = new Student("s3", "tzx3");
+		Professor p1 = new Professor("p1", "haha1");
+		Professor p2 = new Professor("p2", "haha2");
+		Professor p3 = new Professor("p3", "haha3");
+		StudentPreferenceItem sr1 = new StudentPreferenceItem(s1, p1, 0);
+		StudentPreferenceItem sr2 = new StudentPreferenceItem(s1, p2, 1);
+		StudentPreferenceItem sr3 = new StudentPreferenceItem(s2, p1, 2);
+		StudentPreferenceItem sr4 = new StudentPreferenceItem(s3, p3, 3);
+		s1.getPreferList().add(sr1);
+		s1.getPreferList().add(sr2);
+		s2.getPreferList().add(sr3);
+		s3.getPreferList().add(sr4);
+		ProfessorPreferenceItem pr1 = new ProfessorPreferenceItem(p1, s1, 0);
+		ProfessorPreferenceItem pr2 = new ProfessorPreferenceItem(p1, s3, 1);
+		ProfessorPreferenceItem pr3 = new ProfessorPreferenceItem(p2, s3, 2);
+		ProfessorPreferenceItem pr4 = new ProfessorPreferenceItem(p3, s2, 3);
+		ProfessorPreferenceItem pr5 = new ProfessorPreferenceItem(p3, s3, 4);
+		p1.getPreferList().add(pr1);
+		p1.getPreferList().add(pr2);
+		p2.getPreferList().add(pr3);
+		p3.getPreferList().add(pr4);
+		p3.getPreferList().add(pr5);
+		List<Student> students = new ArrayList<Student>();
+		students.add(s1);
+		students.add(s2);
+		students.add(s3);
+		List<Professor> professors = new ArrayList<Professor>();
+		professors.add(p1);
+		professors.add(p2);
+		professors.add(p3);
+		Algorithm a = new Algorithm(students, professors);
+		a.initialization();
+		a.firstStep();
+		a.finish();
+		a.save();
+		System.out.println(a.toJSONArray().toString());
 	}
 }

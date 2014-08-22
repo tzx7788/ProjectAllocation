@@ -31,7 +31,19 @@ public interface AdminService {
 	Response logoutAdmin(@HeaderParam("aid") String aid,
 			@HeaderParam("session") String adminSession);
 
-	@Path("matching")
+	@Path("matching/begin")
+	@POST
+	@Produces({ MediaType.APPLICATION_JSON })
+	Response matchingBegin(@HeaderParam("aid") String aid,
+			@HeaderParam("session") String adminSession);
+	
+	@Path("matching/end")
+	@POST
+	@Produces({ MediaType.APPLICATION_JSON })
+	Response matchingEnd(@HeaderParam("aid") String aid,
+			@HeaderParam("session") String adminSession);
+	
+	@Path("matching/onestep")
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response matching(@HeaderParam("aid") String aid,
