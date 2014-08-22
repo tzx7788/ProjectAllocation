@@ -212,4 +212,23 @@ public class TestAdminService {
 		JSONObject jsonObject = new JSONObject(theString);
 		assertEquals("success",jsonObject.get("status"));
 	}
+	
+	@Test
+	public void testMatching() {
+		AdminService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				AdminService.class);
+		Response response = service.matching("a1","3e051af3f56067d8526cc1237134fcc8", false);
+		System.out.println(response.getMetadata());
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(theString);
+		JSONObject jsonObject = new JSONObject(theString);
+		assertEquals("success",jsonObject.get("status"));
+	}
 }

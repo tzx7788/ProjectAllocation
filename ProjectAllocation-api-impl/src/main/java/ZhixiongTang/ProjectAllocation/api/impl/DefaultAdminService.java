@@ -224,9 +224,26 @@ public class DefaultAdminService implements AdminService {
 	}
 
 	public JSONObject matchingStart(Boolean isFinished) throws AdminException,
-			DatabaseException, AuthException {
-		JSONObject result = new JSONObject();
-		return result;
+			DatabaseException {
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			JSONObject result = new JSONObject();
+			
+			//TODO
+			return result;
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
 	}
 
 	public Response getAllStudents(String aid, String adminSession) {
