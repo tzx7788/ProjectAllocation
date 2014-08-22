@@ -20,6 +20,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import ZhixiongTang.ProjectAllocation.api.StudentService;
@@ -32,8 +33,8 @@ public class DefaultStudentService implements StudentService {
 
 	public Response getInformationFromSID(String sid) {
 		try {
-			Student s = this.findStudent(sid);
-			State state = new State(s);
+			JSONObject json = this.findStudent(sid);
+			State state = new State(json);
 			ResponseBuilder builder = Response.ok(state);
 			builder.entity(state.toString());
 			return builder.build();
@@ -339,7 +340,7 @@ public class DefaultStudentService implements StudentService {
 		}
 	}
 
-	public Student findStudent(String sid) throws StudentException,
+	public JSONObject findStudent(String sid) throws StudentException,
 			DatabaseException {
 		SessionFactory sf = null;
 		Session session = null;
@@ -355,7 +356,9 @@ public class DefaultStudentService implements StudentService {
 			List<Student> list = query.list();
 			if (list.size() == 0)
 				throw new StudentException("No student found!");
-			return list.get(0);
+			list.get(0).preferProfessorsList();
+			JSONObject result = list.get(0).toJSONObjectWithSession();
+			return result;
 		} catch (HibernateException e) {
 			throw new DatabaseException(e.getMessage());
 		} finally {

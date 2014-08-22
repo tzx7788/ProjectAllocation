@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 @Entity
@@ -21,7 +22,6 @@ public class Student extends AbstractEntity {
 	public static final String COL_SID = "SID";
 	public static final String COL_NAME = "NAME";
 	public static final String COL_SESSION = "SESSION";
-
 	public static final String COL_PASSWORD = "PASSWORD";
 
 	private String sid;
@@ -133,11 +133,32 @@ public class Student extends AbstractEntity {
 	public void setResult(Set<Professor> result) {
 		this.result = result;
 	}
+	
+	public void saveOutput() {
+		
+	}
 
 	public JSONObject toJSONObject() {
 		JSONObject result = new JSONObject();
 		result.put("sid", this.getSid());
+		result.put("name", this.getName());;
+		return result;
+	}
+	
+	public JSONObject toJSONObjectWithSession() {
+		JSONObject result = new JSONObject();
+		result.put("sid", this.getSid());
 		result.put("name", this.getName());
+		List<Professor> list = this.preferProfessorsList();
+		JSONArray resultArray = new JSONArray();
+		JSONArray suggestionArray = new JSONArray();
+		for ( Professor professor : this.getResult() )
+			if ( list.contains(professor) )
+				resultArray.put(professor.toJSONObject());
+			else
+				suggestionArray.put(professor.toJSONObject());
+		result.put("result", resultArray);
+		result.put("suggestion", suggestionArray);
 		return result;
 	}
 

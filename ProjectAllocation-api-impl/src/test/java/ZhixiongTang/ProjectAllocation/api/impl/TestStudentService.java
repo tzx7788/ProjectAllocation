@@ -156,10 +156,13 @@ public class TestStudentService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		System.out.println("fasdlfj"+theString);
 		JSONObject jsonObject = new JSONObject(theString);
 		jsonObject = jsonObject.getJSONObject("data");
 		assertEquals(s.getSid().toString(), jsonObject.get("sid"));
 		assertEquals(s.getName().toString(), jsonObject.get("name"));
+		jsonObject.getJSONArray("result");
+		jsonObject.getJSONArray("suggestion");
 	}
 
 	@Test

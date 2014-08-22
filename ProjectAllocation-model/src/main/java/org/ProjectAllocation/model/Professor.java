@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 @Entity
@@ -147,7 +148,7 @@ public class Professor extends AbstractEntity {
 			joinColumns = @JoinColumn(name = COL_PID),
 			inverseJoinColumns = @JoinColumn(name = Student.COL_SID))
 	public Set<Student> getResult() {
-		if ( result == null )
+		if (result == null)
 			result = new HashSet<Student>();
 		return result;
 	}
@@ -161,6 +162,24 @@ public class Professor extends AbstractEntity {
 		result.put("pid", this.getPid());
 		result.put("name", this.getName());
 		result.put("limit", this.getLimit());
+		return result;
+	}
+
+	public JSONObject toJSONObjectWithSession() {
+		JSONObject result = new JSONObject();
+		result.put("pid", this.getPid());
+		result.put("name", this.getName());
+		result.put("limit", this.getLimit());
+		List<Student> list = this.preferStudentsList();
+		JSONArray resultArray = new JSONArray();
+		JSONArray suggestionArray = new JSONArray();
+		for (Student student : this.getResult())
+			if (list.contains(student))
+				resultArray.put(student.toJSONObject());
+			else
+				suggestionArray.put(student.toJSONObject());
+		result.put("result", resultArray);
+		result.put("suggestion", suggestionArray);
 		return result;
 	}
 
