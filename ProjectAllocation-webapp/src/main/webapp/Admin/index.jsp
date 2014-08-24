@@ -7,28 +7,77 @@
 <script type="text/javascript" src="js/jquery.cookie.js"></script>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title id="demo">Insert title here</title>
+<link rel="stylesheet" href="bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="css/flat-ui.css">
+<link href="images/favicon.ico" rel="shortcut icon">
+</head>
+<body>
+	<div class="container">
+		<div class="row demo-row">
+			<div class="span9">
+				<div class="navbar navbar-inverse">
+					<div class="navbar-inner">
+						<div class="container">
+							<button data-target="#nav-collapse-01" data-toggle="collapse"
+								class="btn btn-navbar" type="button"></button>
+							<div id="nav-collapse-01" class="nav-collapse collapse">
+								<ul class="nav">
+									<li class="active"><a href="#fakelink"> Admin</a></li>
+									<li class="disabled"><a href="#fakelink"> Professor</a>
+										<ul>
+											<li><a href="#fakelink">Add a professor</a></li>
+											<li><a href="#fakelink">Delete a professor</a></li>
+										</ul>
+									<li class="disabled"><a href="#fakelink"> Student</a>
+										<ul>
+											<li><a href="#fakelink">Add a student</a></li>
+											<li><a href="#fakelink">Delete a student</a></li>
+										</ul>
+									<li><a href="#fakelink"> Matching </a></li>
+								</ul>
+							</div>
+							<!--/.nav -->
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="span9">
+				<a class="btn btn-large btn-block btn-danger" id="logout-btn" href="#fakelink">Log Out</a>
+			</div>
+		</div>
+	</div>
+</body>
 <script>
-	function verification(aid, session)
-	{
-	
-	}
-	
-	$.ajax({
+	$.ajax({ 
+		type: "POST", 
+		url: "restServices/services/AdminService/information/"+$.cookie('aid'),
+		headers: {session: $.cookie('session')} 
+	}).done(function( msg ) { 
+		if (msg.status === 'fail' ) { 
+			alert(msg.data.msg);
+			window.location.href='Admin/login'; 
+		} else if ( msg.status === 'success') {
+		
+		} 
+	});
+	$(function() {
+        $("#logout-btn").on("click", function(){
+           	$.ajax({
               type: "POST",
-              url: "restServices/services/AdminService/information/"+$.cookie('aid'),
-              headers: {session: $.cookie('session')}
+              url: "restServices/services/AdminService/logout",
+              headers: {aid: $.cookie('aid'), session: $.cookie('session')},
+              beforeSend : function (){
+              } 
             }).done(function( msg ) {
             	if ( msg.status === 'fail' ) {
             		alert(msg.data.msg);
-            		window.location.href='Admin/login';
             	} else if ( msg.status === 'success' ) {
-            		alert(msg.data.name);
+            		window.location.href='Admin/login';
+            		$.cookie('aid', null);
+					$.cookie('session', null);
             	}
             });
+        })
+      });
 </script>
-</head>
-<body>
-	<%%>
-
-</body>
 </html>

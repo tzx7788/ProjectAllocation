@@ -7,7 +7,7 @@
 
 <script type="text/javascript" src="../js/jquery-1.7.js"></script>
 <script type="text/javascript" src="../js/jquery.cookie.js"></script>
-<title>Login</title>
+<title>Admin Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Loading Bootstrap -->
@@ -45,7 +45,7 @@
 						class="login-field-icon fui-lock" for="login-pass"></label>
 				</div>
 
-				<a class="btn btn-primary btn-large btn-block" id='login-btn'>Login</a>
+				<a class="btn btn-large btn-block disabled" id='login-btn'>Login</a>
 			</div>
 		</div>
 	</section>
@@ -58,6 +58,7 @@
               url: "../restServices/services/AdminService/login",
               headers: {aid: $("#login-name").val(), password: $("#login-pass").val()?$("#login-pass").val():""},
               beforeSend : function (){
+              	$("#login-btn").css("btn btn-large btn-block disabled");
               } 
             }).done(function( msg ) {
             	if ( msg.status === 'fail' ) {
