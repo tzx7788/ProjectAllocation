@@ -35,7 +35,7 @@
 				</div>
 				<div class="control-group">
 					<input type="text" class="login-field" value=""
-<!-- 						placeholder="Admin id" id="login-name" /> <label -->
+						placeholder="Admin id" id="login-name" /> <label
 						class="login-field-icon fui-user" for="login-name"></label>
 				</div>
 
@@ -58,7 +58,6 @@
               url: "../restServices/services/AdminService/login",
               headers: {aid: $("#login-name").val(), password: $("#login-pass").val()?$("#login-pass").val():""},
               beforeSend : function (){
-                alert($("#login-btn").val());
               } 
             }).done(function( msg ) {
             	if ( msg.status === 'fail' ) {
