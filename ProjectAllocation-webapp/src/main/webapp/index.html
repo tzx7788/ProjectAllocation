@@ -28,7 +28,7 @@
 		$.cookie('session', session);
 		window.location.href='Admin';
 	}
-	gotoadmin('AID', 'SESSION');
+	gotoadmin('a1', '3e051af3f56067d8526cc1237134fcc8');
 </script>
 
 <link rel="stylesheet" href="css/bootstrap.min.1.4.0.css">
@@ -39,7 +39,7 @@
 	<div class="container-fluid">
 		<div class="row">
 			<div class="span16">
-				<label for="who">Whofadsfsdf ?</label> <input id="who" type="text" />
+				<label for="who">Whof ?</label> <input id="who" type="text" />
 			</div>
 
 			<div class="span16">
@@ -56,12 +56,14 @@
       $(function() {
         $("#send-btn").on("click", function(){
             $.ajax({
-              type: "GET",
-              url: "restServices/testServices/HelloService/sayHello/"+$("#who").val()
+              type: "POST",
+              url: "restServices/services/AdminService/information/"+$("#who").val(),
+              headers: {session: "3e051af3f56067d8526cc1237134fcc8"}
             }).done(function( msg ) {
+            	alert(msg.status);
               $("#response").addClass("alert-message");
               $("#response").addClass("info");
-              $("#response").html(msg);
+              $("#response").html(msg.data.toJSONString());
             });
         })
       });
