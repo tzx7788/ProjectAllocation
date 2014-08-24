@@ -18,6 +18,12 @@ public interface ProfessorService {
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response getInformationFromPID(@PathParam("pid") String pid);
 
+	@Path("information/{pid}")
+	@POST
+	@Produces({ MediaType.APPLICATION_JSON })
+	Response getInformationFromPID(@PathParam("pid") String pid,
+			@HeaderParam("session") String professorSession);
+
 	@Path("preferenceList/{pid}")
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -61,7 +67,7 @@ public interface ProfessorService {
 	Response swapPreferStudent(@HeaderParam("pid") String pid,
 			@HeaderParam("sid1") String sid1, @HeaderParam("sid2") String sid2,
 			@HeaderParam("session") String professorSession);
-	
+
 	@Path("result/{pid}")
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })

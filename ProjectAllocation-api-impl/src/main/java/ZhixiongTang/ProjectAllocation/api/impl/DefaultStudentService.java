@@ -53,6 +53,34 @@ public class DefaultStudentService implements StudentService {
 		}
 	}
 
+	public Response getPostInformationFromSID(String sid, String studentSession) {
+		try {
+			JSONObject json = this.findStudent(sid, studentSession);
+			State state = new State(json);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (StudentException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (AuthException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
+	}
+
 	public Response getPreferenceListFromSID(String sid) {
 		try {
 			List<Professor> list = this.findPreferProfessorsList(sid);
@@ -356,6 +384,36 @@ public class DefaultStudentService implements StudentService {
 			List<Student> list = query.list();
 			if (list.size() == 0)
 				throw new StudentException("No student found!");
+			list.get(0).preferProfessorsList();
+			JSONObject result = list.get(0).toJSONObjectWithSession();
+			return result;
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
+	}
+	
+	public JSONObject findStudent(String sid, String studentSession) throws StudentException,
+	DatabaseException, AuthException {
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Student where SID=:sid";
+			Query query = session.createQuery(hql);
+			query.setString("sid", sid);
+			@SuppressWarnings("unchecked")
+			List<Student> list = query.list();
+			if (list.size() == 0)
+				throw new StudentException("No student found!");
+			this.authorization(list.get(0), studentSession);
 			list.get(0).preferProfessorsList();
 			JSONObject result = list.get(0).toJSONObjectWithSession();
 			return result;

@@ -53,6 +53,34 @@ public class DefaultProfessorService implements ProfessorService {
 		}
 	}
 
+	public Response getInformationFromPID(String pid, String professorSession) {
+		try {
+			JSONObject object = this.findProfessor(pid, professorSession);
+			State state = new State(object);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (ProfessorException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} catch (AuthException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}
+	}
+
 	public Response getPreferenceListFromPID(String pid) {
 		try {
 			List<Student> list = this.findPreferStudentsList(pid);
@@ -439,6 +467,36 @@ public class DefaultProfessorService implements ProfessorService {
 		}
 	}
 
+	public JSONObject findProfessor(String pid, String professorSession)
+			throws ProfessorException, DatabaseException, AuthException {
+		SessionFactory sf = null;
+		Session session = null;
+		Transaction tx = null;
+		try {
+			sf = new Configuration().configure().buildSessionFactory();
+			session = sf.openSession();
+			tx = session.beginTransaction();
+			String hql = "from Professor where PID=:pid";
+			Query query = session.createQuery(hql);
+			query.setString("pid", pid);
+			@SuppressWarnings("unchecked")
+			List<Professor> list = query.list();
+			if (list.size() == 0)
+				throw new ProfessorException("No professor found!");
+			this.authorization(list.get(0), professorSession);
+			list.get(0).preferStudentsList();
+			JSONObject result = list.get(0).toJSONObjectWithSession();
+			return result;
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		} finally {
+			if (tx != null)
+				tx.commit();
+			if (session != null)
+				session.close();
+		}
+	}
+
 	public List<Student> findPreferStudentsList(String pid)
 			throws ProfessorException, DatabaseException {
 		SessionFactory sf = null;
@@ -588,8 +646,8 @@ public class DefaultProfessorService implements ProfessorService {
 		}
 	}
 
-	public Set<Student> findResults(String pid)
-			throws ProfessorException, DatabaseException {
+	public Set<Student> findResults(String pid) throws ProfessorException,
+			DatabaseException {
 		SessionFactory sf = null;
 		Session session = null;
 		Transaction tx = null;
@@ -605,7 +663,7 @@ public class DefaultProfessorService implements ProfessorService {
 			if (list.size() == 0)
 				throw new ProfessorException("No professor found!");
 			Set<Student> result = new HashSet<Student>();
-			for ( Student s : list.get(0).getResult() )
+			for (Student s : list.get(0).getResult())
 				result.add(s);
 			return result;
 		} catch (HibernateException e) {
