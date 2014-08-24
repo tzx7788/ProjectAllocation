@@ -22,7 +22,8 @@
 								class="btn btn-navbar" type="button"></button>
 							<div id="nav-collapse-01" class="nav-collapse collapse">
 								<ul class="nav">
-									<li class="active"><a href="#fakelink"> Admin</a></li>
+									<li class="active"><a href="#fakelink" id="adminname">
+											Admin</a></li>
 									<li class="disabled"><a href="#fakelink"> Professor</a>
 										<ul>
 											<li><a href="#fakelink">Add a professor</a></li>
@@ -33,7 +34,7 @@
 											<li><a href="#fakelink">Add a student</a></li>
 											<li><a href="#fakelink">Delete a student</a></li>
 										</ul>
-									<li><a href="#fakelink"> Matching </a></li>
+									<li><a id="matching-btn" href="#fakelink"> Matching </a></li>
 								</ul>
 							</div>
 							<!--/.nav -->
@@ -41,8 +42,15 @@
 					</div>
 				</div>
 			</div>
+			<div class="span9" id="content">
+				<p>Hello Administrator! test test test test test test test test
+					test test test test test test test test test test test test test
+					test test test test test test test test test test test test test
+					test test test test test test test test test test</p>
+			</div>
 			<div class="span9">
-				<a class="btn btn-large btn-block btn-danger" id="logout-btn" href="#fakelink">Log Out</a>
+				<a class="btn btn-large btn-block btn-danger" id="logout-btn"
+					href="#fakelink">Log Out</a>
 			</div>
 		</div>
 	</div>
@@ -57,7 +65,7 @@
 			alert(msg.data.msg);
 			window.location.href='Admin/login'; 
 		} else if ( msg.status === 'success') {
-		
+			$("#adminname").html(msg.data.name);
 		} 
 	});
 	$(function() {
@@ -77,6 +85,11 @@
 					$.cookie('session', null);
             	}
             });
+        })
+      });
+      $(function() {
+        $("#matching-btn").on("click", function(){
+           	$("#content").empty();
         })
       });
 </script>
