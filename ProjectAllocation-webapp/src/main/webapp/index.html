@@ -18,31 +18,41 @@
   under the License.
 -->
 <html>
-  <head>
-    <script type="text/javascript" src="js/jquery-1.7.js"></script>
-    <link rel="stylesheet" href="css/bootstrap.min.1.4.0.css">
-  </head>
+<head>
+<script type="text/javascript" src="js/jquery-1.7.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script>
+	function gotoadmin(aid, session) 
+	{
+		$.cookie('aid', aid);
+		$.cookie('session', session);
+		window.location.href='Admin';
+	}
+	gotoadmin('AID', 'SESSION');
+</script>
 
-  <body>
-  <div class="container-fluid">
-  <div class="row">
-    <div class="span16">
-      <label for="who">Who ?</label>
-      <input id="who" type="text"/>
-    </div>
+<link rel="stylesheet" href="css/bootstrap.min.1.4.0.css">
 
-    <div class="span16">
-      <input id="send-btn" type="button" class="btn" value="send"/>
-    </div>
+</head>
 
-    <div id="response" class="span6">
-    </div>
-    <div class="span10"></div>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="span16">
+				<label for="who">Whofadsfsdf ?</label> <input id="who" type="text" />
+			</div>
 
-  </div>
-  </div>
-  </body>
-  <script>
+			<div class="span16">
+				<input id="send-btn" type="button" class="btn" value="send" />
+			</div>
+
+			<div id="response" class="span6"></div>
+			<div class="span10"></div>
+
+		</div>
+	</div>
+</body>
+<script>
       $(function() {
         $("#send-btn").on("click", function(){
             $.ajax({

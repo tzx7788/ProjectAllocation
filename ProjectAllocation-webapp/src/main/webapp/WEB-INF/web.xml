@@ -47,6 +47,16 @@
     <servlet-name>CXFServlet</servlet-name>
     <url-pattern>/restServices/*</url-pattern>
   </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>Admin</servlet-name>
+    <jsp-file>/Admin/index.jsp</jsp-file>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>Admin</servlet-name>
+    <url-pattern>/Admin</url-pattern>
+  </servlet-mapping>
 
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
