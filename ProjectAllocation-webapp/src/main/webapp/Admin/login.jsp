@@ -31,11 +31,11 @@
 			<div class="login-form">
 				<div class="log-title">
 					<img src="../images/login/login-icon.png" alt="login">
-					<p>User login</p>
+					<p>Admin login</p>
 				</div>
 				<div class="control-group">
 					<input type="text" class="login-field" value=""
-						placeholder="username" id="login-name" /> <label
+<!-- 						placeholder="Admin id" id="login-name" /> <label -->
 						class="login-field-icon fui-user" for="login-name"></label>
 				</div>
 
