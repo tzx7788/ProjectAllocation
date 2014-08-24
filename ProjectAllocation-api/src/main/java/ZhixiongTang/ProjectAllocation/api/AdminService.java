@@ -19,6 +19,12 @@ public interface AdminService {
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response getInformationFromAid(@PathParam("aid") String aid);
 
+	@Path("information/{aid}")
+	@POST
+	@Produces({ MediaType.APPLICATION_JSON })
+	Response getInformationFromAid(@PathParam("aid") String aid,
+			@HeaderParam("session") String adminSession);
+
 	@Path("login")
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -36,13 +42,13 @@ public interface AdminService {
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response matchingBegin(@HeaderParam("aid") String aid,
 			@HeaderParam("session") String adminSession);
-	
+
 	@Path("matching/end")
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response matchingEnd(@HeaderParam("aid") String aid,
 			@HeaderParam("session") String adminSession);
-	
+
 	@Path("matching/onestep")
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -69,7 +75,7 @@ public interface AdminService {
 	Response deleteStudent(@HeaderParam("aid") String aid,
 			@HeaderParam("sid") String sid,
 			@HeaderParam("session") String adminSession);
-	
+
 	@Path("professors")
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
