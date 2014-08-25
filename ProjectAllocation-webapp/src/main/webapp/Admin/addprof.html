@@ -8,7 +8,7 @@
 <title id="demo">Insert title here</title>
 <link rel="stylesheet" href="../bootstrap/css/bootstrap.css">
 <link rel="stylesheet" href="../css/flat-ui.css">
-<link href="images/favicon.ico" rel="shortcut icon">
+<link href="../images/favicon.ico" rel="shortcut icon">
 </head>
 <body>
 	<div class="container">
@@ -65,6 +65,19 @@
 				href="#fakelink">Log Out</a>
 		</div>
 	</div>
+	<script src="../js/jquery-1.8.3.min.js"></script>
+    <script src="../js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="../js/jquery.ui.touch-punch.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/bootstrap-select.js"></script>
+    <script src="../js/bootstrap-switch.js"></script>
+    <script src="../js/flatui-checkbox.js"></script>
+    <script src="../js/flatui-radio.js"></script>
+    <script src="../js/jquery.tagsinput.js"></script>
+    <script src="../js/jquery.placeholder.js"></script>
+    <script src="../js/jquery.stacktable.js"></script>
+    <script src="http://vjs.zencdn.net/4.3/video.js"></script>
+    <script src="../js/application.js"></script>
 </body>
 <script>
 	$.ajax({ 
@@ -98,6 +111,7 @@
             		alert(msg.data.msg);
             	} else if ( msg.status === 'success' ) {
             		alert(msg.status);
+            		window.location.href='addprof.html';
             	}
             });
         })

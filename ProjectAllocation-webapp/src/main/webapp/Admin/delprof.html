@@ -6,9 +6,13 @@
 <script type="text/javascript" src="../js/jquery.cookie.js"></script>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title id="demo">Insert title here</title>
-<link rel="stylesheet" href="../bootstrap/css/bootstrap.css">
-<link rel="stylesheet" href="../css/flat-ui.css">
-<link href="images/favicon.ico" rel="shortcut icon">
+<link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
+
+<!-- Loading Flat UI -->
+<link href="../css/flat-ui.css" rel="stylesheet">
+<link href="../css/demo.css" rel="stylesheet">
+
+<link rel="shortcut icon" href="images/favicon.ico">
 </head>
 <body>
 	<div class="container">
@@ -32,8 +36,8 @@
 										<li><a href="delstu.html">Delete a student</a></li>
 									</ul>
 								<li>
-								<li><a id="matching-btn"
-									href="matching.html"> Matching </a></li>
+								<li><a id="matching-btn" href="matching.html"> Matching
+								</a></li>
 							</ul>
 						</div>
 						<!--/.nav -->
@@ -43,21 +47,13 @@
 		</div>
 		<div class="row" id="content"></div>
 		<div class="row demo-row">
-			<div class="span1"></div>
-			<div class="span3">
-				<input id="pid" type="text" class="span3" placeholder="Professor ID" value="">
+			<div class="span6">
+				<select class="select-block" id="professorlist" name="herolist"
+					style="display: none;">
+				</select>
 			</div>
 			<div class="span3">
-				<input id="name" type="text" class="span3" placeholder="Name" value="">
-			</div>
-			<div class="span3">
-				<input id="password" type="password" class="span3" placeholder="Password" value="">
-			</div>
-		</div>
-		<div class="row demo-row">
-			<div class="span4"></div>
-			<div class="span3">
-				<a class="btn btn-large btn-block btn-primary" id="add-btn">Add/Update</a>
+				<a class="btn btn-large btn-block btn-danger" id="delete-btn">Delete</a>
 			</div>
 		</div>
 		<div class="row">
@@ -65,31 +61,45 @@
 				href="#fakelink">Log Out</a>
 		</div>
 	</div>
+	<script src="../js/jquery-ui-1.10.3.custom.min.js"></script>
+	<script src="../js/jquery.ui.touch-punch.min.js"></script>
+	<script src="../js/bootstrap.min.js"></script>
+	<script src="../js/bootstrap-select.js"></script>
+	<script src="../js/bootstrap-switch.js"></script>
+	<script src="../js/flatui-checkbox.js"></script>
+	<script src="../js/flatui-radio.js"></script>
+	<script src="../js/jquery.tagsinput.js"></script>
+	<script src="../js/jquery.placeholder.js"></script>
+	<script src="../js/jquery.stacktable.js"></script>
+	<script src="../js/application.js"></script>
 </body>
 <script>
 	$.ajax({ 
 		type: "POST", 
-		url: "../restServices/services/AdminService/information/"+$.cookie('aid'),
-		headers: {session: $.cookie('session')} 
+		url: "../restServices/services/AdminService/professors",
+		headers: {aid: $.cookie('aid'), session: $.cookie('session')} 
 	}).done(function( msg ) { 
 		if (msg.status === 'fail' ) { 
 			alert(msg.data.msg);
-			window.location.href='login'; 
 		} else if ( msg.status === 'success') {
-			$("#adminname").html(msg.data.name);
+			$("#professorlist").empty();
+			$.each(msg.data, function(i,professor){
+				var option=document.createElement("option");
+				option.value = professor.pid;
+				option.innerHTML="id:"+professor.pid+" 	name:"+professor.name+" 	limit:"+professor.limit;
+				$("#professorlist").append(option);      
+ 			});
 		} 
 	});
       $(function() {
-        $("#add-btn").on("click", function(){
+        $("#delete-btn").on("click", function(){
            	$.ajax({
               type: "POST",
-              url: "../restServices/services/AdminService/professors/add",
+              url: "../restServices/services/AdminService/professors/delete",
               headers: {
               	aid: $.cookie('aid'), 
               	session: $.cookie('session'),
-              	pid: $("#pid").val(),
-              	name: $("#name").val(),
-              	password: $("#password").val(),
+              	pid: $("#professorlist").val(),
               	},
               beforeSend : function (){
               } 
@@ -98,9 +108,11 @@
             		alert(msg.data.msg);
             	} else if ( msg.status === 'success' ) {
             		alert(msg.status);
+            		window.location.href='delprof.html';
             	}
             });
         })
       });
 </script>
+
 </html>
