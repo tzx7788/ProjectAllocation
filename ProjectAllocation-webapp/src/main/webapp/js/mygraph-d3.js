@@ -14,6 +14,13 @@ function redraw() {
 	});
 }
 
+function loadStudents(force) {
+	
+}
+function loadProfessors(force) {
+	
+}
+
 d3.json("my_graph_data.json", function(error, graph) {
 
 	console.log("graph.nodes", graph.nodes)

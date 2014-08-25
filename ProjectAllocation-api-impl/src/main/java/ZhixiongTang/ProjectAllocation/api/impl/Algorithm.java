@@ -437,7 +437,8 @@ public class Algorithm {
 		for ( Student student : students )
 			for ( Professor professor : student.getResult() ) {
 				JSONObject object = new JSONObject();
-				object.put(student.getSid(), professor.getPid());
+				object.put("source",student.getSid());
+				object.put("target",professor.getPid());
 				array.put(object);
 			}
 		return array;
