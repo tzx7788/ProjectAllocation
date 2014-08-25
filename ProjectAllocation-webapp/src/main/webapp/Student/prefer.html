@@ -50,26 +50,28 @@
 						</tr>
 					</thead>
 					<tbody id="professorlist">
-						<tr>
-							<td>1</td>
-							<td>Mark</td>
-							<td>Otto</td>
-							<td>@mdo</td>
-						</tr>
-						<tr>
-							<td>2</td>
-							<td>Jacob</td>
-							<td>Thornton</td>
-							<td>@fat</td>
-						</tr>
-						<tr>
-							<td>3</td>
-							<td>Larry</td>
-							<td>the Bird</td>
-							<td>@twitter</td>
-						</tr>
 					</tbody>
 				</table>
+			</div>
+		</div>
+		<div class="row demo-row">
+			<div class="span6">
+				<select class="select-block" id="professordeleteselect" name="herolist"
+					style="display: none;">
+				</select>
+			</div>
+			<div class="span3">
+				<a class="btn btn-large btn-block btn-danger" id="delete-btn">Delete</a>
+			</div>
+		</div>
+		<div class="row demo-row">
+			<div class="span6">
+				<select class="select-block" id="professorselect" name="herolist"
+					style="display: none;">
+				</select>
+			</div>
+			<div class="span3">
+				<a class="btn btn-large btn-block btn-primary" id="add-btn">Add</a>
 			</div>
 		</div>
 		<div class="row">
@@ -129,11 +131,76 @@
 			window.location.href='login.html'; 
 		} else if ( msg.status === 'success') {
 			$("#professorlist").empty();
+			$("#professordeleteselect").empty();
 			$.each(msg.data, function(i,professor){
-				$("#professorlist").append(todata(professor,i+1));      
+				$("#professorlist").append(todata(professor,i+1));
+				var option=document.createElement("option");
+				option.value = professor.pid;
+				option.innerHTML="id:"+professor.pid+" 	name:"+professor.name+" 	limit:"+professor.limit;
+				$("#professordeleteselect").append(option);      
  			});
 		} 
 	});
+	$(function() {
+        $("#delete-btn").on("click", function(){
+           	$.ajax({
+              type: "POST",
+              url: "../restServices/services/StudentService/delete",
+              headers: {
+              	sid: $.cookie('sid'), 
+              	session: $.cookie('session'),
+              	pid: $("#professordeleteselect").val(),
+              	},
+              beforeSend : function (){
+              } 
+            }).done(function( msg ) {
+            	if ( msg.status === 'fail' ) {
+            		alert(msg.data.msg);
+            	} else if ( msg.status === 'success' ) {
+            		alert(msg.status);
+            		window.location.href='prefer.html';
+            	}
+            });
+        })
+      });
+	$.ajax({ 
+		type: "GET", 
+		url: "../restServices/services/AdminService/professors",
+	}).done(function( msg ) { 
+		if (msg.status === 'fail' ) { 
+			alert(msg.data.msg);
+		} else if ( msg.status === 'success') {
+			$("#professorselect").empty();
+			$.each(msg.data, function(i,professor){
+				var option=document.createElement("option");
+				option.value = professor.pid;
+				option.innerHTML="id:"+professor.pid+" 	name:"+professor.name+" 	limit:"+professor.limit;
+				$("#professorselect").append(option);      
+ 			});
+		} 
+	});
+	$(function() {
+        $("#add-btn").on("click", function(){
+           	$.ajax({
+              type: "POST",
+              url: "../restServices/services/StudentService/add",
+              headers: {
+              	sid: $.cookie('sid'), 
+              	session: $.cookie('session'),
+              	pid: $("#professorselect").val(),
+              	},
+              beforeSend : function (){
+              } 
+            }).done(function( msg ) {
+            	if ( msg.status === 'fail' ) {
+            		alert(msg.data.msg);
+            	} else if ( msg.status === 'success' ) {
+            		alert(msg.status);
+            		window.location.href='prefer.html';
+            	}
+            });
+        })
+      });
 	$(function() {
         $("#logout-btn").on("click", function(){
            	$.ajax({
