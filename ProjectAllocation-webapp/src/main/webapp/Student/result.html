@@ -20,10 +20,12 @@
 							class="btn btn-navbar" type="button"></button>
 						<div id="nav-collapse-01" class="nav-collapse collapse">
 							<ul class="nav">
-								<li class="active"><a id="studentname"  href="profile.html"> Student</a></li>
+								<li><a id="studentname" href="profile.html"> Student</a></li>
 								<li><a id="prefer-btn" href="prefer.html"> Preference</a></li>
-								<li><a id="result-btn" href="result.html"> Result</a></li>
-								<li><a id="suggestion-btn" href="suggestion.html"> Suggestion</a></li>
+								<li class="active"><a id="result-btn" href="result.html">
+										Result</a></li>
+								<li><a id="suggestion-btn" href="suggestion.html">
+										Suggestion</a></li>
 							</ul>
 						</div>
 						<!--/.nav -->
@@ -31,7 +33,29 @@
 				</div>
 			</div>
 		</div>
-		<div class="row" id="content"></div>
+		<div class="row" id="content">
+			<div class="panel panel-info">
+				<!-- Default panel contents -->
+				<div class="panel-heading">Result</div>
+				<div class="panel-body">
+					<p>Here's your supervisor according to matching result, if you
+						dont have one, please go to suggestion page to update your
+						preference'</p>
+				</div>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>ID</th>
+							<th>Name</th>
+							<th>Limit</th>
+						</tr>
+					</thead>
+					<tbody id="professorlist">
+					</tbody>
+				</table>
+			</div>
+		</div>
 		<div class="row">
 			<a class="btn btn-large btn-block btn-danger" id="logout-btn"
 				href="#fakelink">Log Out</a>
@@ -52,6 +76,22 @@
 	<script src="../js/application.js"></script>
 </body>
 <script>
+function todata(professor,index) {
+		var tr=document.createElement("tr");
+		var i=document.createElement("td");
+		i.innerHTML=index;
+		var pid=document.createElement("td");
+		pid.innerHTML=professor.pid;
+		var name=document.createElement("td");
+		name.innerHTML=professor.name;
+		var limit=document.createElement("td");
+		limit.innerHTML=professor.limit;
+		tr.appendChild(i);
+		tr.appendChild(pid);
+		tr.appendChild(name);
+		tr.appendChild(limit);
+		return tr;
+	}
 	$.ajax({ 
 		type: "POST", 
 		url: "../restServices/services/StudentService/information/"+$.cookie('sid'),
@@ -61,7 +101,10 @@
 			alert(msg.data.msg);
 			window.location.href='login.html'; 
 		} else if ( msg.status === 'success') {
-			
+			$("#professorlist").empty();
+			$.each(msg.data.result, function(i,professor){
+				$("#professorlist").append(todata(professor,i+1)); 
+ 			});
 		} 
 	});
 	$(function() {
