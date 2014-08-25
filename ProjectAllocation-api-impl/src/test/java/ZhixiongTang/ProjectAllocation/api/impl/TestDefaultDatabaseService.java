@@ -106,5 +106,24 @@ public class TestDefaultDatabaseService extends TestCase {
 		tx.commit();
 		session.close();
 	}
+	
+	@Test
+	public void testLoad() {
+		DatabaseService service = JAXRSClientFactory.create("http://localhost:"
+				+ port + "/" + getRestServicesPath() + "/services/",
+				DatabaseService.class);
+		Response response = service.loadTestData("developer", 2);
+		System.out.println(response.getMetadata());
+		InputStream inputStream = (InputStream) response.getEntity();
+		String theString = null;
+		try {
+			theString = IOUtils.toString(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		JSONObject jsonObject = new JSONObject(theString);
+		assertEquals(jsonObject.get("status"),"success");
+	}
 
 }

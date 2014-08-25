@@ -1,5 +1,9 @@
 package ZhixiongTang.ProjectAllocation.api.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
@@ -48,7 +52,7 @@ public class DefaultDatabaseService implements DatabaseService {
 		builder.entity(state.toString());
 		return builder.build();
 	}
-	
+
 	public Response loadTestData(String authentification, Integer version) {
 		try {
 			authorization(authentification);
@@ -61,8 +65,16 @@ public class DefaultDatabaseService implements DatabaseService {
 			return builder.build();
 		}
 		try {
-			if ( version == 1 )
-				this.loadTestData();
+			switch (version) {
+			case 1:
+				this.loadTestData1();
+				break;
+			case 2:
+				this.loadTestData2();
+				break;
+			default:
+				break;
+			}
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 			Error error = new Error(e.getMessage());
@@ -96,7 +108,7 @@ public class DefaultDatabaseService implements DatabaseService {
 		}
 	}
 
-	private void loadTestData() throws DatabaseException {
+	private void loadTestData1() throws DatabaseException {
 		this.clear();
 		SessionFactory sf = new Configuration().configure()
 				.buildSessionFactory();
@@ -111,7 +123,7 @@ public class DefaultDatabaseService implements DatabaseService {
 			Professor p3 = new Professor("p3", "haha3");
 			s1.setSession("3e051af3f56067d8526cc1237134fcc8");
 			p1.setSession("3e051af3f56067d8526cc1237134fcc8");
-			Admin a1 = new Admin("a1","admin");
+			Admin a1 = new Admin("a1", "admin");
 			a1.setSession("3e051af3f56067d8526cc1237134fcc8");
 			s1.getResult().add(p1);
 			s1.getResult().add(p2);
@@ -147,6 +159,54 @@ public class DefaultDatabaseService implements DatabaseService {
 			session.save(p1);
 			session.save(p2);
 			session.save(p3);
+			tx.commit();
+			session.close();
+		} catch (HibernateException e) {
+			throw new DatabaseException(e.getMessage());
+		}
+	}
+
+	private void loadTestData2() throws DatabaseException {
+		this.clear();
+		SessionFactory sf = new Configuration().configure()
+				.buildSessionFactory();
+		Session session = sf.openSession();
+		try {
+			Transaction tx = session.beginTransaction();
+			Admin a1 = new Admin("a1", "admin");
+			a1.setSession("3e051af3f56067d8526cc1237134fcc8");
+			session.save(a1);
+			List<Student> students = new ArrayList<Student>();
+			for (int index = 0 ; index < 30 ; index ++ ) {
+				Student student = new Student("s"+index,"tzx"+index);
+				students.add(student);
+				session.save(student);
+			}
+			List<Professor> professors = new ArrayList<Professor>();
+			for (int index = 0 ; index < 10 ; index ++ ) {
+				Professor professor = new Professor("p"+index,"haha"+index,3);
+				professors.add(professor);
+				session.save(professor);
+			}
+			Random random = new Random();
+			for ( Student student : students ) {
+				for ( int index = 0 ; index < 10 ; index++ ) {
+					Professor professor = professors.get(random.nextInt(10));
+					StudentPreferenceItem item = new StudentPreferenceItem(student,professor,index);
+					if ( !student.preferProfessorsList().contains(professor) )
+						student.getPreferList().add(item);
+				}
+				session.save(student);
+			}
+			for ( Professor professor : professors ) {
+				for ( int index = 0 ; index < 30 ; index++ ) {
+					Student student = students.get(random.nextInt(30));
+					ProfessorPreferenceItem item = new ProfessorPreferenceItem(professor,student,index);
+					if ( !professor.preferStudentsList().contains(student) )
+						professor.getPreferList().add(item);
+				}
+				session.save(professor);
+			}
 			tx.commit();
 			session.close();
 		} catch (HibernateException e) {

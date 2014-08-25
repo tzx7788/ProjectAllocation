@@ -123,7 +123,6 @@ var force = d3.layout.force()
     .start();
     
 
-(nodes["fadf"] = {name:"fadf"});
 force = d3.layout.force()
     .nodes(d3.values(nodes))
     .links(links)
@@ -183,7 +182,7 @@ function mouseout() {
 }
            	$.ajax({
               type: "POST",
-              url: "../restServices/services/AdminService/matching/onestep",
+              url: "../restServices/services/AdminService/matching/end",
               headers: {aid: $.cookie('aid'), session: $.cookie('session'), isFinished: false },
               beforeSend : function (){
               } 
