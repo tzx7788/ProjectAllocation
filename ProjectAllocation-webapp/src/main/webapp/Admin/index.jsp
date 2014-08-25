@@ -21,7 +21,7 @@
 							class="btn btn-navbar" type="button"></button>
 						<div id="nav-collapse-01" class="nav-collapse collapse">
 							<ul class="nav">
-								<li class="active"><a href="/.." id="adminname"> Admin</a></li>
+								<li class="active"><a href="Admin" id="adminname"> Admin</a></li>
 								<li class="disabled"><a> Professor</a>
 									<ul>
 										<li><a href="Admin/addprof.html">Add/update a professor</a></li>

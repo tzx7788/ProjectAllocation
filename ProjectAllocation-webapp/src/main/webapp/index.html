@@ -21,51 +21,60 @@
 <head>
 <script type="text/javascript" src="js/jquery-1.7.js"></script>
 <script type="text/javascript" src="js/jquery.cookie.js"></script>
+<link rel="stylesheet" href="bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="css/flat-ui.css">
+<link href="images/favicon.ico" rel="shortcut icon">
 <script>
 	function gotoadmin(aid, session) 
 	{
 		$.cookie('aid', aid);
 		$.cookie('session', session);
-		window.location.href='Admin';
+		window.location.href='Admin/Login';
 	}
-	gotoadmin('a1', '3e051af3f56067d8526cc1237134fcc8');
 </script>
-
-<link rel="stylesheet" href="css/bootstrap.min.1.4.0.css">
-
 </head>
 
 <body>
-	<div class="container-fluid">
-		<div class="row">
-			<div class="span16">
-				<label for="who">Whof ?</label> <input id="who" type="text" />
+	<div class="container">
+		<div class="login">
+			<div class="login-screen">
+				<div class="login-icon">
+					<img alt="Book" src="images/icons/Pensils@2x.png">
+					<h4>
+						Welcome to <small>MAHRUD University</small>
+					</h4>
+				</div>
+
+				<div class="login-form">
+					<div class="btn-group">
+						<div class="span1"></div>
+						<button type="button" class="btn btn-primary dropdown-toggle"
+							data-toggle="dropdown">MAHRUD University Online <span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="Professor/login.html">Log in as a Professor</a></li>
+							<li><a href="Student/login.html">Log in as a Student</a></li>
+							<li><a href="Admin/login">Log in as an Administrator</a></li>
+						</ul>
+					</div>
+					<a href="about.html" class="login-link">About this site</a>
+				</div>
 			</div>
-
-			<div class="span16">
-				<input id="send-btn" type="button" class="btn" value="send" />
-			</div>
-
-			<div id="response" class="span6"></div>
-			<div class="span10"></div>
-
 		</div>
 	</div>
+	<script src="js/jquery-ui-1.10.3.custom.min.js"></script>
+	<script src="js/jquery.ui.touch-punch.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/bootstrap-select.js"></script>
+	<script src="js/bootstrap-switch.js"></script>
+	<script src="js/flatui-checkbox.js"></script>
+	<script src="js/flatui-radio.js"></script>
+	<script src="js/jquery.tagsinput.js"></script>
+	<script src="js/jquery.placeholder.js"></script>
+	<script src="js/jquery.stacktable.js"></script>
+	<script src="js/application.js"></script>
 </body>
 <script>
-      $(function() {
-        $("#send-btn").on("click", function(){
-            $.ajax({
-              type: "POST",
-              url: "restServices/services/AdminService/information/"+$("#who").val(),
-              headers: {session: "3e051af3f56067d8526cc1237134fcc8"}
-            }).done(function( msg ) {
-            	alert(msg.status);
-              $("#response").addClass("alert-message");
-              $("#response").addClass("info");
-              $("#response").html(msg.data.toJSONString());
-            });
-        })
-      });
+
   </script>
 </html>

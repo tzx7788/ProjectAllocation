@@ -46,6 +46,7 @@
 				</div>
 
 				<a class="btn btn-large btn-block disabled" id='login-btn'>Login</a>
+				<a href="/" class="login-link">Back to main page</a>
 			</div>
 		</div>
 	</section>
@@ -64,7 +65,7 @@
             	if ( msg.status === 'fail' ) {
             		alert(msg.data.msg);
             	} else if ( msg.status === 'success' ) {
-            		window.location.href='..';
+            		window.location.href='/Admin';
             		$.cookie('aid', msg.data.aid);
 					$.cookie('session', msg.session);
             	}
