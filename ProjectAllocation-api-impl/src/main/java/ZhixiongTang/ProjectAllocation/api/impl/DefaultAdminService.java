@@ -842,4 +842,42 @@ public class DefaultAdminService implements AdminService {
 		}
 	}
 
+	public Response getAllStudentsWithGET() {
+		try {
+			JSONArray array = new JSONArray();
+			Set<Student> students = this.getAllStudents();
+			for (Student student : students)
+				array.put(student.toJSONObject());
+			State state = new State(array);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}  catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} 
+	}
+
+	public Response getAllProfessorsWithGET() {
+		try {
+			JSONArray array = new JSONArray();
+			Set<Professor> professors = this.getAllProfessors();
+			for (Professor professor : professors)
+				array.put(professor.toJSONObject());
+			State state = new State(array);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		}  catch (DatabaseException e) {
+			Error error = new Error(e.getMessage());
+			State state = new State(error);
+			ResponseBuilder builder = Response.ok(state);
+			builder.entity(state.toString());
+			return builder.build();
+		} 
+	}
+
 }

@@ -61,6 +61,11 @@ public interface AdminService {
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response getAllStudents(@HeaderParam("aid") String aid,
 			@HeaderParam("session") String adminSession);
+	
+	@Path("students")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	Response getAllStudentsWithGET();
 
 	@Path("students/add")
 	@POST
@@ -81,6 +86,11 @@ public interface AdminService {
 	@Produces({ MediaType.APPLICATION_JSON })
 	Response getAllProfessors(@HeaderParam("aid") String aid,
 			@HeaderParam("session") String adminSession);
+	
+	@Path("professors")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	Response getAllProfessorsWithGET();
 
 	@Path("professors/add")
 	@POST

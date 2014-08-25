@@ -194,5 +194,24 @@ function mouseout() {
 					drawgraph(msg.data.result);
             	}
             });
+            	$(function() {
+        $("#logout-btn").on("click", function(){
+           	$.ajax({
+              type: "POST",
+              url: "../restServices/services/AdminService/logout",
+              headers: {aid: $.cookie('aid'), session: $.cookie('session')},
+              beforeSend : function (){
+              } 
+            }).done(function( msg ) {
+            	if ( msg.status === 'fail' ) {
+            		alert(msg.data.msg);
+            	} else if ( msg.status === 'success' ) {
+            		window.location.href='login';
+            		$.cookie('aid', null);
+					$.cookie('session', null);
+            	}
+            });
+        })
+      });
 </script>
 </html>
