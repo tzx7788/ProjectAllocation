@@ -1,0 +1,124 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<script type="text/javascript" src="../js/jquery-1.7.js"></script>
+<script type="text/javascript" src="../js/jquery.cookie.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title id="demo">Insert title here</title>
+<link rel="stylesheet" href="../bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="../css/flat-ui.css">
+<link href="../images/favicon.ico" rel="shortcut icon">
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="navbar navbar-inverse">
+				<div class="navbar-inner">
+					<div class="container">
+						<button data-target="#nav-collapse-01" data-toggle="collapse"
+							class="btn btn-navbar" type="button"></button>
+						<div id="nav-collapse-01" class="nav-collapse collapse">
+							<ul class="nav">
+								<li><a id="professorname" href="profile.html">
+										Professor</a></li>
+								<li><a id="prefer-btn" href="prefer.html"> Preference</a></li>
+								<li class="active"><a id="result-btn" href="result.html"> Result</a></li>
+								<li><a id="suggestion-btn" href="suggestion.html">
+										Suggestion</a></li>
+							</ul>
+						</div>
+						<!--/.nav -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row" id="content">
+			<div class="panel panel-info">
+				<!-- Default panel contents -->
+				<div class="panel-heading">Panel heading</div>
+				<div class="panel-body">
+					<p></p>
+				</div>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>ID</th>
+							<th>Name</th>
+						</tr>
+					</thead>
+					<tbody id="studentlist">
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="row">
+			<a class="btn btn-large btn-block btn-danger" id="logout-btn"
+				href="#fakelink">Log Out</a>
+		</div>
+	</div>
+	<script src="../js/jquery-1.8.3.min.js"></script>
+	<script src="../js/jquery-ui-1.10.3.custom.min.js"></script>
+	<script src="../js/jquery.ui.touch-punch.min.js"></script>
+	<script src="../js/bootstrap.min.js"></script>
+	<script src="../js/bootstrap-select.js"></script>
+	<script src="../js/bootstrap-switch.js"></script>
+	<script src="../js/flatui-checkbox.js"></script>
+	<script src="../js/flatui-radio.js"></script>
+	<script src="../js/jquery.tagsinput.js"></script>
+	<script src="../js/jquery.placeholder.js"></script>
+	<script src="../js/jquery.stacktable.js"></script>
+	<script src="http://vjs.zencdn.net/4.3/video.js"></script>
+	<script src="../js/application.js"></script>
+</body>
+<script>
+	function todata(student,index) {
+		var tr=document.createElement("tr");
+		var i=document.createElement("td");
+		i.innerHTML=index;
+		var sid=document.createElement("td");
+		sid.innerHTML=student.sid;
+		var name=document.createElement("td");
+		name.innerHTML=student.name;
+		tr.appendChild(i);
+		tr.appendChild(sid);
+		tr.appendChild(name);
+		return tr;
+	}
+	$.ajax({ 
+		type: "POST", 
+		url: "../restServices/services/ProfessorService/information/"+$.cookie('pid'),
+		headers: {session: $.cookie('session')} 
+	}).done(function( msg ) { 
+		if (msg.status === 'fail' ) { 
+			alert(msg.data.msg);
+			window.location.href='login.html'; 
+		} else if ( msg.status === 'success') {
+			$("#professorname").html(msg.data.name);
+			$.each(msg.data.result, function(i,student){
+				$("#studentlist").append(todata(student,i+1));
+ 			});
+		} 
+	});
+	$(function() {
+        $("#logout-btn").on("click", function(){
+           	$.ajax({
+              type: "POST",
+              url: "../restServices/services/ProfessorService/logout",
+              headers: {pid: $.cookie('pid'), session: $.cookie('session')},
+              beforeSend : function (){
+              } 
+            }).done(function( msg ) {
+            	if ( msg.status === 'fail' ) {
+            		alert(msg.data.msg);
+            	} else if ( msg.status === 'success' ) {
+            		window.location.href='login.html';
+            		$.cookie('aid', null);
+					$.cookie('session', null);
+            	}
+            });
+        })
+      });
+</script>
+</html>
