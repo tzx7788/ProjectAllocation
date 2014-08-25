@@ -1,10 +1,80 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Insert title here</title>
+<script type="text/javascript" src="js/jquery-1.7.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<link rel="stylesheet" href="bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="css/flat-ui.css">
+<link href="images/favicon.ico" rel="shortcut icon">
+<script>
+	function gotoadmin(aid, session) 
+	{
+		$.cookie('aid', aid);
+		$.cookie('session', session);
+		window.location.href='Admin/Login';
+	}
+</script>
 </head>
-<body>
 
+<body>
+	<div class="container">
+		<div class="login">
+			<div class="login-screen">
+				<div class="login-icon">
+					<img alt="Book" src="images/icons/Pensils@2x.png">
+					<h4>
+						Welcome to <small>MAHRUD University</small>
+					</h4>
+				</div>
+
+				<div class=row>
+					<ul class="list-group">
+						<li class="list-group-item">Author: Tang Zhixiong</li>
+						<li class="list-group-item">Professor: Georgios
+							Theodoropoulos</li>
+						<li class="list-group-item">TH04: Project Allocation</li>
+						<li class="list-group-item">This project is using following 3rd party library: <a href="http://designmodo.com">Flat UI</a>
+						<a href="http://jquery.com">jquery</a>
+						<a href="http://d3js.org">d3js</a>
+						</li>
+						<li class="list-group-item">Source Code: <a href="https://github.com/tzx7788/ProjectAllocation">Github</a></li>
+					</ul>
+					<a href="/" class="login-link">Back to main page</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="js/jquery-ui-1.10.3.custom.min.js"></script>
+	<script src="js/jquery.ui.touch-punch.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/bootstrap-select.js"></script>
+	<script src="js/bootstrap-switch.js"></script>
+	<script src="js/flatui-checkbox.js"></script>
+	<script src="js/flatui-radio.js"></script>
+	<script src="js/jquery.tagsinput.js"></script>
+	<script src="js/jquery.placeholder.js"></script>
+	<script src="js/jquery.stacktable.js"></script>
+	<script src="js/application.js"></script>
 </body>
+<script>
+
+  </script>
 </html>
