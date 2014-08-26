@@ -231,6 +231,5 @@
     <module>ProjectAllocation-model</module>
     <module>ProjectAllocation-webapp</module>
     <module>ProjectAllocation-webapp-exec</module>
-    <module>ProjectAllocation-webapp-it</module>
   </modules>
 </project>

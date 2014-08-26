@@ -199,6 +199,8 @@ public class DefaultDatabaseService implements DatabaseService {
 				session.save(student);
 			}
 			for ( Professor professor : professors ) {
+				if ( professor == professors.get(0) )
+					break;
 				for ( int index = 0 ; index < 30 ; index++ ) {
 					Student student = students.get(random.nextInt(30));
 					ProfessorPreferenceItem item = new ProfessorPreferenceItem(professor,student,index);
